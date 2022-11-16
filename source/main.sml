@@ -1,5 +1,5 @@
 
-(* Read a nice poem from a file into a list of strings *)
+(* Read content from a file into a list of strings *)
 fun readFile(filename) =
     let val file = TextIO.openIn filename
         val content = TextIO.inputAll file
