@@ -1,0 +1,24 @@
+String path_fastq = “~/Documents/FASTQ/SRR001666_1.fastq”;
+String path_adapters = “~/Documents/FASTQ/adapter.fasta”;
+String path_primer = “~/Documents/FASTQ/primer.fasta”;
+
+FASTQ data = readfq(path_fastq);
+FASTA adapter = readfa(path_adapter);
+FASTA primer = readfa(path_primer);
+
+data = qctrl(data);
+data = trim(data, primer, adapter);
+
+FASTA dna = tofasta(data)
+Sequence mRNA = transcribe(data);
+
+List of Sequence miRNAs = [rUUCCCUUUGUCAUCCUAUGCCU,
+                           rUUCGCUAUGUCAUCCUAUUCCU,
+                           rAAGGCUUUGUCAUCGUAUGCCU];
+
+Integer posicao = 0;
+while (posicao < 3) {
+     print(motif(mRNA, miRNAs[posicao]))
+     posicao = posicao + 1
+}
+
