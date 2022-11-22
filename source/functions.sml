@@ -29,8 +29,15 @@ fun point(sequence : string, position : int, monomer : string) =
 fun transcribe(sequence) = 
     let
       val monomers = explode(sequence)
+      fun iter([]) = [] 
+      | iter(x::xs) = 
+      if x = #"A" then [#"U"] @ iter(xs)
+      else if x = #"T" then [#"A"] @ iter(xs)
+      else if x = #"C" then [#"G"] @ iter(xs)
+      else [#"C"] @ iter(xs)
+      val result = iter(monomers)
     in
-      (* fazer iteração, transcrever cada caracter e depois fazer implode*)
+      implode(result)
     end;
 
 fun translate(sequence) = 
