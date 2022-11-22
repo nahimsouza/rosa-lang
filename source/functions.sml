@@ -1,15 +1,17 @@
 open String;
 
-fun ins(sequence, fragment, position) = let
+fun ins(sequence, fragment, position) = 
+    let
         val first = substring(sequence, 0, position - 1)
         val second = substring(sequence, position, size(sequence) - position)
     in
         concat [first, fragment, second]
     end;
 
-fun del(sequence : string, start : int, end : int) = let
+fun del(sequence : string, start : int, final : int) = 
+    let
         val first = substring(sequence, 0, start - 1)
-        val second = substring(sequence, end, size(sequence) - end)
+        val second = substring(sequence, final, size(sequence) - final)
     in
         concat [first, second]
     end;
