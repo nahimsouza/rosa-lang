@@ -40,7 +40,7 @@ fun translate(sequence) =
       (* fazer iteração, traduzir cada caracter e depois fazer implode*)
     end;
 
-(* rever essa função mais adiante para ser específica para dna, rna e protein *)
+(* rever essa função mais adiante para ser específica para dna e rna *)
 fun complement(sequence) = 
     let
       val monomers = explode(sequence)
