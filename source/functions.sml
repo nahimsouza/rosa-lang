@@ -26,11 +26,26 @@ fun point(sequence : string, position : int, monomer : string) =
         else raise Fail "Monomer length must be equal to 1"
     end;
 
-fun transcribe(sequence) = ;
+fun transcribe(sequence) = 
+    let
+      val monomers = explode(sequence)
+    in
+      (* fazer iteração, transcrever cada caracter e depois fazer implode*)
+    end;
 
-fun translate(sequence) = ;
+fun translate(sequence) = 
+    let
+      val monomers = explode(sequence)
+    in
+      (* fazer iteração, traduzir cada caracter e depois fazer implode*)
+    end;
 
-fun complement(sequence) = ;
+fun complement(sequence : string) = 
+    let
+      val monomers = explode(sequence)
+    in
+      (* fazer iteração, complementar cada caracter e depois fazer implode*)
+    end;
 
 fun motif(sequence, motif) = ;
 
