@@ -40,14 +40,28 @@ fun translate(sequence) =
       (* fazer iteração, traduzir cada caracter e depois fazer implode*)
     end;
 
-(* rever essa função mais adiante para ser específica para dna e rna *)
-fun complement(sequence) = 
+(* rever essas duas funções abaixo mais adiante para serem feitas apenas pela chamada de complement() em função de ser dna ou rna!!!! *)
+fun complement_dna(sequence) = 
     let
       val monomers = explode(sequence)
       fun iter([]) = [] 
       | iter(x::xs) = 
       if x = #"A" then [#"T"] @ iter(xs)
       else if x = #"T" then [#"A"] @ iter(xs)
+      else if x = #"C" then [#"G"] @ iter(xs)
+      else [#"C"] @ iter(xs)
+      val result = iter(monomers)
+    in
+      implode(result)
+    end;
+
+fun complement_rna(sequence) = 
+    let
+      val monomers = explode(sequence)
+      fun iter([]) = [] 
+      | iter(x::xs) = 
+      if x = #"A" then [#"U"] @ iter(xs)
+      else if x = #"U" then [#"A"] @ iter(xs)
       else if x = #"C" then [#"G"] @ iter(xs)
       else [#"C"] @ iter(xs)
       val result = iter(monomers)
