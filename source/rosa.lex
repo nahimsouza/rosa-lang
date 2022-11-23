@@ -16,7 +16,7 @@
 %let primitivo = ("Integer"|"String"|"Boolean"|"Real"|"Sequence"|"Quality");
 
 %let FASTA = ([">"] {String})  {Sequence};
-%let FASTQ = (["@"] {String}) {Sequence} (["+"] {Sequence})? {Quality};
+%let FASTQ = (["@"] {String}) {Sequence} (["+"] {String}?) {Quality};
 %let composto = ("FASTA" | "FASTQ");
 
 %let List = ("List of "({primitivo}|{composto}));
