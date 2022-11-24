@@ -130,8 +130,20 @@ fun complement_rna(sequence) =
     in
       implode(result)
     end;
-
-fun motif(sequence, motif) = ;
+    
+fun motif(sequence : string, motif : string) = 
+let
+  val i = 0
+  val sequence = sequence
+  val motif = motif
+  fun iter(sequence, motif, i) = 
+  if i = size(sequence) - size(motif) then ""
+  else if substring(sequence, i, size(motif)) = motif
+  then concat [(Int.toString(i)), " ", (iter(sequence, motif, i + 1))]
+  else iter(sequence, motif, i + 1)
+in
+  iter(sequence, motif, 0)
+end;
 
 fun qctrl(fastq, threshol, range) = ;
 
