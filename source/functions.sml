@@ -44,59 +44,57 @@ fun translate(sequence) =
 let
   val i = 0
   val trans = false
-  val codon = ""
-  fun iter(seq, size(seq) - 1, trans) = []
-  | iter(seq, i, false) = 
-  codon = substring(sequence, i, 3)
-  if codon = "AUG" orelse codon = "ATG"
+  fun iter(seq : string, i : int, false : bool) = 
+  if Int.compare(i, size(seq) - 3) = GREATER then []
+  else if substring(seq, i, 3) = "AUG" orelse substring(seq, i, 3) = "ATG"
   then [#"M"] @ iter(seq, i + 3, true)
   else iter(seq, i + 1, false)
-  | iter(seq, i, true) =
-  codon = substring(seq, i, 3)
-  if codon = "GCT" orelse codon = "GCC" orelse codon = "GCA" orelse codon = "GCG" orelse "GCU"
+  | iter(seq : string, i : int, true : bool) =
+  if Int.compare(i, size(seq) - 3) = GREATER then []
+  else if substring(seq, i, 3) = "GCT" orelse substring(seq, i, 3) = "GCC" orelse substring(seq, i, 3) = "GCA" orelse substring(seq, i, 3) = "GCG" orelse substring(seq, i, 3) = "GCU"
   then [#"A"] @ iter(seq, i + 3, true)
-  else if codon = "CGT" orelse codon = "CGU" orelse codon = "CGC" orelse codon = "CGA" orelse codon = "CGG" orelse codon = "AGA" orelse codon = "AGG"
+  else if substring(seq, i, 3) = "CGT" orelse substring(seq, i, 3) = "CGU" orelse substring(seq, i, 3) = "CGC" orelse substring(seq, i, 3) = "CGA" orelse substring(seq, i, 3) = "CGG" orelse substring(seq, i, 3) = "AGA" orelse substring(seq, i, 3) = "AGG"
   then [#"R"] @ iter(seq, i + 3, true)
-  else if codon = "AAT" orelse codon = "AAU" orelse codon = "AAC"
+  else if substring(seq, i, 3) = "AAT" orelse substring(seq, i, 3) = "AAU" orelse substring(seq, i, 3) = "AAC"
   then [#"N"] @ iter(seq, i + 3, true)
-  else if codon = "GAT" orelse codon = "GAU" orelse codon = "GAC"
+  else if substring(seq, i, 3) = "GAT" orelse substring(seq, i, 3) = "GAU" orelse substring(seq, i, 3) = "GAC"
   then [#"D"] @ iter(seq, i + 3, true)
-  else if codon = "TGT" orelse codon = "UGU" orelse codon = "TGC" orelse codon = "UGC"
+  else if substring(seq, i, 3) = "TGT" orelse substring(seq, i, 3) = "UGU" orelse substring(seq, i, 3) = "TGC" orelse substring(seq, i, 3) = "UGC"
   then [#"C"] @ iter(seq, i + 3, true)
-  else if codon = "CAA" orelse codon = "CAG"
+  else if substring(seq, i, 3) = "CAA" orelse substring(seq, i, 3) = "CAG"
   then [#"Q"] @ iter(seq, i + 3, true)
-  else if codon = "GAA" orelse codon = "GAG"
+  else if substring(seq, i, 3) = "GAA" orelse substring(seq, i, 3) = "GAG"
   then [#"E"] @ iter(seq, i + 3, true)
-  else if codon = "GGT" orelse codon = "GGU" orelse codon = "GGC" orelse codon = "GGA" orelse codon = "GGG"
-  then [#"G"] iter(seq, i + 3, true)
-  else if codon = "CAT" orelse codon = "CAU" orelse codon = "CAC"
+  else if substring(seq, i, 3) = "GGT" orelse substring(seq, i, 3) = "GGU" orelse substring(seq, i, 3) = "GGC" orelse substring(seq, i, 3) = "GGA" orelse substring(seq, i, 3) = "GGG"
+  then [#"G"] @ iter(seq, i + 3, true)
+  else if substring(seq, i, 3) = "CAT" orelse substring(seq, i, 3) = "CAU" orelse substring(seq, i, 3) = "CAC"
   then [#"H"] @ iter(seq, i + 3, true)
-  else if codon = "ATT" orelse codon = "AUU" orelse codon = "ATC" orelse codon = "AUC" orelse codon = "ATA"
+  else if substring(seq, i, 3) = "ATT" orelse substring(seq, i, 3) = "AUU" orelse substring(seq, i, 3) = "ATC" orelse substring(seq, i, 3) = "AUC" orelse substring(seq, i, 3) = "ATA"
   then [#"I"] @ iter(seq, i + 3, true)
-  else if codon = "TTA" orelse codon = "UUA" orelse codon = "TTG" orelse codon = "UUG" orelse codon = "CTT" orelse codon = "CUU" orelse codon = "CTC" orelse 
-  codon = "CUC" orelse codon = "CTA" orelse codon = "CUA" orelse codon = "CTG" orelse codon = "CUG"
+  else if substring(seq, i, 3) = "TTA" orelse substring(seq, i, 3) = "UUA" orelse substring(seq, i, 3) = "TTG" orelse substring(seq, i, 3) = "UUG" orelse substring(seq, i, 3) = "CTT" orelse substring(seq, i, 3) = "CUU" orelse substring(seq, i, 3) = "CTC" orelse 
+  substring(seq, i, 3) = "CUC" orelse substring(seq, i, 3) = "CTA" orelse substring(seq, i, 3) = "CUA" orelse substring(seq, i, 3) = "CTG" orelse substring(seq, i, 3) = "CUG"
   then [#"L"] @ iter(seq, i + 3, true)
-  else if codon = "AAA" orelse codon = "AAG"
+  else if substring(seq, i, 3) = "AAA" orelse substring(seq, i, 3) = "AAG"
   then [#"K"] @ iter(seq, i + 3, true)
-  else if codon = "TTT" orelse codon = "UUU" orelse codon = "TTC" orelse codon = "UUC"
+  else if substring(seq, i, 3) = "TTT" orelse substring(seq, i, 3) = "UUU" orelse substring(seq, i, 3) = "TTC" orelse substring(seq, i, 3) = "UUC"
   then [#"F"] @ iter(seq, i + 3, true)
-  else if codon = "CCT" orelse codon = "CCU" orelse codon = "CCC" orelse codon = "CCA" orelse codon = "CCG"
+  else if substring(seq, i, 3) = "CCT" orelse substring(seq, i, 3) = "CCU" orelse substring(seq, i, 3) = "CCC" orelse substring(seq, i, 3) = "CCA" orelse substring(seq, i, 3) = "CCG"
   then [#"P"] @ iter(seq, i + 3, true)
-  else if codon = "TCT" orelse codon = "UCU" orelse codon = "TCC" orelse codon = "UCC" orelse codon = "TCA" orelse codon = "UCA" orelse codon = "TCG" orelse 
-  codon = "UCG" orelse codon = "AGT" orelse codon = "AGU" orelse codon = "AGC"
+  else if substring(seq, i, 3) = "TCT" orelse substring(seq, i, 3) = "UCU" orelse substring(seq, i, 3) = "TCC" orelse substring(seq, i, 3) = "UCC" orelse substring(seq, i, 3) = "TCA" orelse substring(seq, i, 3) = "UCA" orelse substring(seq, i, 3) = "TCG" orelse 
+  substring(seq, i, 3) = "UCG" orelse substring(seq, i, 3) = "AGT" orelse substring(seq, i, 3) = "AGU" orelse substring(seq, i, 3) = "AGC"
   then [#"S"] @ iter(seq, i + 3, true)
-  else if codon = "ACT" orelse codon = "ACU" orelse codon = "ACC" orelse codon = "ACA" orelse codon = "ACG"
+  else if substring(seq, i, 3) = "ACT" orelse substring(seq, i, 3) = "ACU" orelse substring(seq, i, 3) = "ACC" orelse substring(seq, i, 3) = "ACA" orelse substring(seq, i, 3) = "ACG"
   then [#"T"] @ iter(seq, i + 3, true)
-  else if codon = "TGG" orelse codon = "UGG"
+  else if substring(seq, i, 3) = "TGG" orelse substring(seq, i, 3) = "UGG"
   then [#"W"] @ iter(seq, i + 3, true)
-  else if codon = "TAT" orelse codon = "UAU" orelse codon = "TAC" orelse codon = "UAC"
+  else if substring(seq, i, 3) = "TAT" orelse substring(seq, i, 3) = "UAU" orelse substring(seq, i, 3) = "TAC" orelse substring(seq, i, 3) = "UAC"
   then [#"Y"] @ iter(seq, i + 3, true)
-  else if codon = "GTT" orelse codon = "GUU" orelse codon = "GTC" orelse codon = "GUC" orelse codon = "GTA" orelse codon = "GUA" orelse codon = "GTG" orelse codon = "GUG"
+  else if substring(seq, i, 3) = "GTT" orelse substring(seq, i, 3) = "GUU" orelse substring(seq, i, 3) = "GTC" orelse substring(seq, i, 3) = "GUC" orelse substring(seq, i, 3) = "GTA" orelse substring(seq, i, 3) = "GUA" orelse substring(seq, i, 3) = "GTG" orelse substring(seq, i, 3) = "GUG"
   then [#"V"] @ iter(seq, i + 3, true)
-  else if codon = "TAA" orelse codon = "UAA" orelse codon = "TGA" orelse codon = "UGA" orelse codon = "TAG" orelse codon = "UAG"
+  else if substring(seq, i, 3) = "TAA" orelse substring(seq, i, 3) = "UAA" orelse substring(seq, i, 3) = "TGA" orelse substring(seq, i, 3) = "UGA" orelse substring(seq, i, 3) = "TAG" orelse substring(seq, i, 3) = "UAG"
   then [] @ iter(seq, i + 3, false)
-
-  result = iter(sequence)
+  else []
+  val result = iter(sequence, 0, false)
 
 in
   implode(result)
