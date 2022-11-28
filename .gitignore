@@ -1,0 +1,6 @@
+.cm/
+grammar/.cm
+src/rosa.grm.sml
+src/rosa.lex.sml
+*.x86-linux
+src/rosa-main.sml

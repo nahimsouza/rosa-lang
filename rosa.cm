@@ -1,0 +1,16 @@
+Library
+    structure RosaLexer
+    functor RosaParseFn
+    structure RosaTest
+is
+    $/basis.cm
+    $/smlnj-lib.cm
+    $/ml-lpt-lib.cm
+    source/grammar.sml
+    source/astree.sml
+    source/statistics.sml
+    source/helper.sml
+    source/typechecker.sml
+    source/rosa.grm : ml-antlr
+    source/rosa.lex : ml-ulex
+    source/main.sml

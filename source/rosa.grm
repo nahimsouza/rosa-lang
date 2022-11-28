@@ -1,0 +1,330 @@
+%name Rosa;
+
+%defs (
+    open ParseTree
+    fun getTupla x = Helper.toTupla(Helper.getTupleFrom x)
+    fun getSampleTuple x = List.map getTupla (String.tokens Helper.isSemi (Helper.removeBrackets(String.implode(Helper.toSemi(String.explode x)))))
+    fun getInt x = (TypeChecker.extractInt x)
+    fun getFloat x = (TypeChecker.extractFloat x)
+    fun getString x = (TypeChecker.extractString x)
+    fun getBool x = (TypeChecker.extractBool x)
+    fun getList x = (TypeChecker.extractList x)
+
+    fun getVar v = AtomMap.appi (fn (k,w) => print (
+        let val _ = print(Atom.toString k)
+            val _ = print (TypeChecker.show w)
+        in
+            ""
+        end)) v
+);
+
+(* DARWIN - nao modificado
+
+%tokens
+    : KW_let ("let") | KW_in ("in") | KW_title ("title") | SSTRING of (string list)
+    | ID of string | NUM of Int.int | REAL of Real.real | SINT of (Int.int list)
+    | PLUS ("+") | EEQ ("==") | SFLOAT of (Real.real list)
+    | TIMES ("*") | DIV("/") | MINUS ("-") | COMMA(",") | SBOOL of (Bool.bool list)
+    | LP ("(") | RP (")") | BOOL of bool | AND ("&&") | OR ("||")
+    | SPACE (" ") | GT(">") | LT("<") | LEQ("<=") | GEQ(">=") | NEQ("!=")
+    | KW_variables ("variables") | SEMI | TIPO of string | DOTDOT(":=")
+    | KW_commands ("commands") | STR of string | KW_Print ("print")
+    | KW_endvars ("end variables") | KW_terminate ("terminate")
+    | KW_SUM ("sum") | KW_PROD ("prod") | EMPTY ("{}") | KW_GETS("getString")
+    | KW_IF("if") | KW_THEN("then") | KW_ELSE("else") | KW_WHILE("while")
+    | KW_DO("do") | KW_END("end") | KW_TOSTRING ("toString") | KW_MEAN("mean")
+    | KW_CORR("correlation") | KW_MEDIAN("median") | KW_STDEV("stdDeviation")
+    | KW_VAR("variance") | KW_RT("rt") | KW_POW("pow") | KW_GETF("getFloat") | KW_COV("covariance")
+    | KW_LINREG("linearRegression") | VOID("void") | TUPLE of string | STUPLE of string
+    | KW_GETI("getInt") | KW_TOFLOAT("toFloat") | KW_TOINT("toInt") | CONCAT("++")
+    ; *)
+
+%tokens
+    : KW_if ("if")
+    | KW_elif ("elif")
+    | KW_else ("else")
+    | KW_then ("then")
+    | KW_while ("while")
+    | KW_True; ("True;")
+    | KW_False ("False")
+    | KW_Integer ("Integer")
+    | KW_Real ("Real")
+    | KW_String ("String")
+    | KW_Boolean ("Boolean")
+    | KW_FASTA ("FASTA")
+    | KW_FASTQ ("FASTQ")
+    | KW_Quality ("Quality")
+    | KW_Sequence ("Sequence")
+    | KW_List ("List")
+    | KW_of ("of")
+    | KW_ins ("ins")
+    | KW_del ("del")
+    | KW_point ("point")
+    | KW_transcribe ("transcribe")
+    | KW_translate ("translate")
+    | KW_complement ("complement")
+    | KW_motif ("motif")
+    | KW_qctrl ("qctrl")
+    | KW_trim ("trim")
+    | KW_tofasta ("tofasta")
+    | KW_read ("read")
+    | KW_readfa ("readfa")
+    | KW_readfq ("readfq")
+    | KW_writefa ("writefa")
+    | KW_writefq ("writefq")
+    | KW_print ("print")
+    | KW_input ("input")
+    | KW_NOT ("NOT")
+    | KW_AND ("AND")
+    | KW_OR ("OR")
+    ;
+
+%keywords
+    KW_if
+    KW_elif,
+    KW_else,
+    KW_then,
+    KW_while,
+    KW_True;,
+    KW_False,
+    KW_Integer,
+    KW_Real,
+    KW_String,
+    KW_Boolean,
+    KW_FASTA,
+    KW_FASTQ,
+    KW_Quality,
+    KW_Sequence,
+    KW_List,
+    KW_of,
+    KW_ins,
+    KW_del,
+    KW_point,
+    KW_transcribe,
+    KW_translate,
+    KW_complement,
+    KW_motif,
+    KW_qctrl,
+    KW_trim,
+    KW_tofasta,
+    KW_read,
+    KW_readfa,
+    KW_readfq,
+    KW_writefa,
+    KW_writefq,
+    KW_print,
+    KW_input,
+    KW_NOT,
+    KW_AND,
+    KW_OR
+    ;
+
+%refcell tree : ParseTree.RoseTree = (nil);
+%refcell vars : tipo AtomMap.map = (AtomMap.empty);
+%refcell ts : string AtomMap.map = (AtomMap.empty);
+
+program
+    : KW_title STR SEMI
+      KW_variables
+      variables
+      KW_commands
+      (commands)* => (SR)
+    ;
+
+commands
+    : prints SEMI  => (prints)
+    | assign SEMI  => (assign)
+    | conditional  => (conditional)
+    | loop => (loop)
+    ;
+
+assign
+    : ID DOTDOT expr => (tree:=(ParseTree.Assign(ID,expr))::(!tree); (ParseTree.Assign(ID,expr)))
+    ;
+
+expr
+    : %try exp_string => (exp_string)
+    | %try exp_bool => (exp_bool)
+    | %try exp_arit => (exp_arit)
+    | %try exp_tupla => (exp_tupla)
+    | %try funcs_float => (funcs_float)
+    | %try funcs_int => (funcs_int)
+    | %try funcs_string => (funcs_string)
+    | %try val_list => (val_list)
+    ;
+
+val_list
+    : SINT => (ParseTree.intListToSampleExpr(SINT))
+    | SFLOAT => (ParseTree.floatListToSampleExpr(SFLOAT))
+    | SBOOL => (ParseTree.boolListToSampleExpr(SBOOL))
+    | SSTRING => (ParseTree.stringListToSampleExpr(SSTRING))
+    | STUPLE => (ParseTree.Const (ParseTree.Sample (getSampleTuple STUPLE)))
+    | ID => (ParseTree.Var ID)
+    ;
+
+prints
+   : KW_Print LP exp_string RP => (
+        let
+            val k = (ParseTree.Print exp_string)::(!tree)
+        in
+            tree := k;
+            (ParseTree.Print exp_string)
+        end
+    )
+   ;
+funcs_string
+    : KW_TOSTRING LP expr RP => (ParseTree.FuncOne(ParseTree.ToString,expr))
+    | KW_GETS LP string_list COMMA exp_arit RP => (ParseTree.getBinaryFun("getString", string_list, exp_arit))
+    | CONCAT LP string_list COMMA string_list RP => (ParseTree.getBinaryFun("concat", string_list1, string_list2))
+    | KW_LINREG LP numbers_list COMMA numbers_list RP => (ParseTree.getBinaryFun("linearRegression", numbers_list1, numbers_list2))
+    ;
+funcs_int
+    : KW_GETI LP int_list COMMA exp_arit RP =>  (ParseTree.getBinaryFun("getInt", int_list, exp_arit))
+    | KW_TOINT LP expr RP => (ParseTree.getFunctionOne("toInt", expr))
+    ;
+funcs_float
+    : KW_SUM LP EMPTY RP => (ParseTree.getFunctionOne("sum", ParseTree.Const(Grammar.Sample nil)))
+    | KW_SUM LP float_list RP => (ParseTree.getFunctionOne("sum", float_list))
+    | KW_PROD LP EMPTY RP  => (ParseTree.getFunctionOne("prod", ParseTree.Const(Grammar.Sample nil)))
+    | KW_PROD LP float_list RP => (ParseTree.getFunctionOne("prod", float_list))
+    | KW_MEAN LP numbers_list RP => (ParseTree.getFunctionOne("mean", numbers_list))
+    | KW_CORR LP numbers_list COMMA numbers_list RP => (ParseTree.getBinaryFun("correlation", numbers_list1, numbers_list2))
+    | KW_STDEV LP numbers_list RP => (ParseTree.getFunctionOne("stdDeviation", numbers_list))
+    | KW_MEDIAN LP numbers_list RP => (ParseTree.getFunctionOne("median", numbers_list))
+    | KW_VAR LP numbers_list RP => (ParseTree.getFunctionOne("variance", numbers_list))
+    | KW_COV LP numbers_list COMMA numbers_list RP => (ParseTree.getBinaryFun("covariance", numbers_list1, numbers_list2))
+    | KW_GETF LP float_list COMMA exp_arit RP => (ParseTree.getBinaryFun("getFloat", float_list, exp_arit))
+    | KW_TOFLOAT LP expr RP => (ParseTree.getFunctionOne("toFloat", expr))
+    ;
+
+float_list
+    : ID => (ParseTree.Var ID)
+    | SFLOAT => (ParseTree.floatListToSampleExpr(SFLOAT))
+    ;
+string_list
+    : ID => (ParseTree.Var ID)
+    | SSTRING => (ParseTree.stringListToSampleExpr(SSTRING))
+    ;
+int_list
+    : ID => (ParseTree.Var ID)
+    | SINT => (ParseTree.intListToSampleExpr(SINT))
+    ;
+
+numbers_list
+    : %try float_list => (float_list)
+    | %try int_list => (int_list)
+    ;
+
+exp_bool
+    : %try addExp rel_op addExp => (ParseTree.getExprBoolTree(rel_op,addExp1,addExp2))
+    | %try op_bool => (op_bool)
+    | %try atom_bool => (atom_bool)
+    ;
+exp_tupla
+    : ID => (ParseTree.Var ID)
+    | TUPLE => (ParseTree.Const (Helper.toTupla(Helper.getTupleFrom (TUPLE))))
+    ;
+op_bool
+    : %try atom_bool AND atom_bool => (ParseTree.FuncTwo(ParseTree.And,atom_bool1,atom_bool2))
+    | %try atom_bool OR atom_bool => (ParseTree.FuncTwo(ParseTree.Or,atom_bool1,atom_bool2))
+    ;
+exp_string
+    : %try op_str => (op_str)
+    | %try atom_string => (atom_string)
+    ;
+
+op_str
+    : atom_string CONCAT atom_string => (ParseTree.FuncTwo(ParseTree.Concat,atom_string1,atom_string2))
+    ;
+
+atom_string
+    : ID => (ParseTree.Var ID)
+    | STR => (ParseTree.Const (Grammar.Primitivo (Grammar.String_ STR)))
+    | funcs_string
+    | LP exp_string RP
+    ;
+
+rel_op
+    : EEQ => ("==")
+    | NEQ => ("!=")
+    | GEQ => (">=")
+    | LEQ => ("<=")
+    | LT => ("<")
+    | GT => (">")
+    ;
+
+atom_bool
+    : ID => (ParseTree.Var ID)
+    | BOOL => ( (ParseTree.Const (Grammar.Primitivo (Grammar.Boolean_ BOOL))))
+    | LP exp_bool RP
+    ;
+
+loop
+    : KW_WHILE exp_bool KW_DO (commands)* KW_END
+        => (
+            let
+                val w = (ParseTree.While(exp_bool,SR))
+            in
+                tree := (w :: (!tree));
+                w
+            end
+        )
+    ;
+
+conditional
+    : KW_IF exp_bool KW_THEN (commands)* KW_ELSE (commands)* KW_END
+        => (
+            let
+                val ifi = (ParseTree.If(exp_bool,SR1,SR2))
+            in
+                tree := (ifi :: (!tree));
+                ifi
+            end
+        )
+    ;
+
+exp_arit
+    : %try addExp => (addExp)
+    | %try atomicExp => (atomicExp)
+    ;
+
+addExp
+    : %try multExp PLUS multExp => (ParseTree.FuncTwo(ParseTree.Add,multExp1,multExp2))
+    | %try multExp MINUS multExp => (ParseTree.FuncTwo(ParseTree.Sub,multExp1,multExp2))
+    | %try multExp => (multExp)
+    ;
+
+multExp
+    : %try rootExp DIV rootExp => (ParseTree.FuncTwo(ParseTree.Div,rootExp1,rootExp2))
+    | %try rootExp TIMES rootExp => (ParseTree.FuncTwo(ParseTree.Mul,rootExp1,rootExp2))
+    | %try rootExp => (rootExp)
+    ;
+
+rootExp
+    : %try KW_RT LP prefixExp COMMA prefixExp RP => (ParseTree.FuncTwo(ParseTree.RT,prefixExp1,prefixExp2))
+    | %try KW_POW LP prefixExp COMMA prefixExp RP => (ParseTree.FuncTwo(ParseTree.Pow,prefixExp1,prefixExp2))
+    | %try prefixExp => (prefixExp)
+    ;
+
+prefixExp
+    : atomicExp => (atomicExp)
+    | "-" prefixExp => (ParseTree.FuncTwo(ParseTree.Sub,ParseTree.Const(Grammar.Primitivo (Grammar.Int_ 0)),prefixExp))
+    ;
+
+atomicExp
+    : ID => (ParseTree.Var ID)
+    | NUM => (ParseTree.Const (Grammar.Primitivo (Grammar.Int_ NUM)))
+    | REAL => (ParseTree.Const (Grammar.Primitivo (Grammar.Float_ REAL)))
+    | "(" exp_arit ")"
+    | funcs_float => (funcs_float)
+    | funcs_int => (funcs_int)
+    ;
+
+variables
+    : (declaration)* KW_endvars => ((fn(_) => ()) SR)
+    ;
+
+declaration
+    : TIPO ID SEMI => (vars:=ParseTree.insere(!vars,Atom.atom ID,Atom.toString(Atom.atom TIPO));
+                      ts:=AtomMap.insert(!ts,Atom.atom ID,TIPO))
+    ;
