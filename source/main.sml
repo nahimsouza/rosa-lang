@@ -1,13 +1,17 @@
 
-(* Load content from a file into a list of chars *)
+(* Load content from a file into a string *)
 fun loadFile(filename) =
-    let 
+    let
         val file = TextIO.openIn filename
         val content = TextIO.inputAll file
         val _ = TextIO.closeIn file
     in
-        (String.explode content)
+        content
     end
+
+fun isWordSeparator c = Char.isSpace c orelse c = #"\n" orelse c = #"\t"
+
+fun splitText(text) = String.tokens isWordSeparator text
 
 datatype token =
     PLUS
@@ -22,49 +26,69 @@ datatype token =
     | LT
     | EQUAL
     | DIFF
+    | DQUOTE
+    | SEMICOLON
     | LEQ
     | GEQ
     | OR
     | AND
     | NOT
-    | KEYWORD of string
-    | INTEGER of int
-    | REAL of real
-    | LITERAL of char
+    | TRUE
+    | FALSE
+    | LITERAL of string
+    | INTEGER_TYPE
+    | REAL_TYPE
+    | BOOLEAN_TYPE
+    | STRING_TYPE
+    | SEQUENCE_TYPE
+    | QUALITY_TYPE
+    | FASTA_TYPE
+    | FASTQ_TYPE
+    (* | INTEGER of int
+    | REAL of real *)
 
 fun tokenize nil = nil
-    | tokenize (#" " :: cs) = tokenize cs 
-    | tokenize (#"\n" :: cs) = tokenize cs 
-    | tokenize (#"\t" :: cs) = tokenize cs 
-    | tokenize (#"+" :: cs) = (PLUS :: tokenize cs)
-    | tokenize (#"-" :: cs) = (MINUS :: tokenize cs)
-    | tokenize (#"*" :: cs) = (TIMES :: tokenize cs)
-    | tokenize (#"/" :: cs) = (DIV :: tokenize cs)
-    | tokenize (#"(" :: cs) = (LPAREN :: tokenize cs)
-    | tokenize (#")" :: cs) = (RPAREN :: tokenize cs)
-    | tokenize (#"]" :: cs) = (LBRACKET :: tokenize cs)
-    | tokenize (#"[" :: cs) = (RBRACKET :: tokenize cs)
-    | tokenize (#"<" :: #"=" :: cs) = (LEQ :: tokenize cs)
-    | tokenize (#">" :: #"=" :: cs) = (GEQ :: tokenize cs)
-    | tokenize (#">" :: cs) = (GT :: tokenize cs)
-    | tokenize (#"<" :: cs) = (LT :: tokenize cs)
-    | tokenize (#"=" :: #"=" :: cs) = (EQUAL :: tokenize cs)
-    | tokenize (#"!" :: #"=" :: cs) = (DIFF :: tokenize cs)
-    | tokenize (#"O" :: #"R" :: cs) = (OR :: tokenize cs)
-    | tokenize (#"A" :: #"N" :: #"D" :: cs) = (AND :: tokenize cs)
-    | tokenize (#"N" :: #"O" :: #"T" :: cs) = (NOT :: tokenize cs)
-    | tokenize (c :: cs) = LITERAL c :: tokenize cs
+    | tokenize ("+" :: strList) = (PLUS :: tokenize strList)
+    | tokenize ("-" :: strList) = (MINUS :: tokenize strList)
+    | tokenize ("*" :: strList) = (TIMES :: tokenize strList)
+    | tokenize ("/" :: strList) = (DIV :: tokenize strList)
+    | tokenize ("(" :: strList) = (LPAREN :: tokenize strList)
+    | tokenize (")" :: strList) = (RPAREN :: tokenize strList)
+    | tokenize ("]" :: strList) = (LBRACKET :: tokenize strList)
+    | tokenize ("[" :: strList) = (RBRACKET :: tokenize strList)
+    | tokenize ("\"" :: strList) = (DQUOTE :: tokenize strList)
+    | tokenize (";" :: strList) = (SEMICOLON :: tokenize strList)
+    | tokenize ("<=" :: strList) = (LEQ :: tokenize strList)
+    | tokenize (">=" :: strList) = (GEQ :: tokenize strList)
+    | tokenize (">" :: strList) = (GT :: tokenize strList)
+    | tokenize ("<" :: strList) = (LT :: tokenize strList)
+    | tokenize ("==" :: strList) = (EQUAL :: tokenize strList)
+    | tokenize ("!=" :: strList) = (DIFF :: tokenize strList)
+    | tokenize ("OR" :: strList) = (OR :: tokenize strList)
+    | tokenize ("AND" :: strList) = (AND :: tokenize strList)
+    | tokenize ("NOT" :: strList) = (NOT :: tokenize strList)
+    | tokenize ("True" :: strList) = (TRUE :: tokenize strList)
+    | tokenize ("False" :: strList) = (FALSE :: tokenize strList)
+    | tokenize ("Integer" :: strList) = (INTEGER_TYPE :: tokenize strList)
+    | tokenize ("Real" :: strList) = (REAL_TYPE :: tokenize strList)
+    | tokenize ("Boolean" :: strList) = (BOOLEAN_TYPE :: tokenize strList)
+    | tokenize ("String" :: strList) = (STRING_TYPE :: tokenize strList)
+    | tokenize ("Sequence" :: strList) = (SEQUENCE_TYPE :: tokenize strList)
+    | tokenize ("Quality" :: strList) = (QUALITY_TYPE :: tokenize strList)
+    | tokenize ("FASTA" :: strList) = (FASTA_TYPE :: tokenize strList)
+    | tokenize ("FASTQ" :: strList) = (FASTQ_TYPE :: tokenize strList)
+    | tokenize (s :: strList) = LITERAL s :: tokenize strList
 
 (*
-    precisar tokenizar:
-    - simbolos com 1 char: OK
-    - simbolos com mais chars: OK
-    - palavras-chave: dá pra fazer como os simbolos, mas é melhor criar forma de concatenar string
-    - id
+    precisa tokenizar:
+    - identificadores
     - numeros (real e int)
+    - criar identificador e ver como fazer assign
+        > os valores precisam ser atribuidos e o tipo verificado de alguma forma
 *)
 
 
 (* Main flow *)
-val program = loadFile("examples/sample.rosa")
-val tokenized = tokenize(program)
+val program = loadFile "examples/sample.rosa"
+val splited = splitText program
+val tokenized = tokenize splited
