@@ -18,7 +18,7 @@ List of Sequence miRNAs = [ rUUCCCUUUGUCAUCCUAUGCCU ,
 
 Integer posicao = 0 ;
 while ( posicao < 3 ) {
-     print ( motif ( mRNA , miRNAs [ posicao ] ) )
-     posicao = posicao + 1
+     print ( motif ( mRNA , miRNAs [ posicao ] ) );
+     posicao = posicao + 1;
 }
 

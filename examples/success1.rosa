@@ -1,0 +1,3 @@
+Integer val = 1;
+val = val + 10;
+print(val);
