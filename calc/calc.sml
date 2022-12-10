@@ -25,6 +25,10 @@ struct
 	 structure ParserData = CalcLrVals.ParserData
 	 structure Lex = CalcLex)
 
+datatype value =
+  Integer of int
+  | Real of real
+
 (* 
  * We need a function which given a lexer invokes the parser. The
  * function invoke does this.
@@ -45,24 +49,25 @@ struct
  *)
 
   fun parse () = 
-      let val lexer = CalcParser.makeLexer (fn _ =>
-                                               (case TextIO.inputLine TextIO.stdIn
-                                                of SOME s => s
-                                                 | _ => ""))
-	  val dummyEOF = CalcLrVals.Tokens.EOF(0,0)
-	  val dummySEMI = CalcLrVals.Tokens.SEMI(0,0)
-	  fun loop lexer =
-	      let val (result,lexer) = invoke lexer
-		  val (nextToken,lexer) = CalcParser.Stream.get lexer
-		  val _ = case result
-			    of SOME r =>
-				TextIO.output(TextIO.stdOut,
-				       "result = " ^ (Int.toString r) ^ "\n")
-			     | NONE => ()
-	       in if CalcParser.sameToken(nextToken,dummyEOF) then ()
-		  else loop lexer
-	      end
-       in loop lexer
-      end
+    let 
+        val lexer = CalcParser.makeLexer (fn _ =>
+                                            (case TextIO.inputLine TextIO.stdIn
+                                               of SOME s => s
+                                               | _ => ""))
+        val dummyEOF = CalcLrVals.Tokens.EOF(0,0)
+        val dummySEMI = CalcLrVals.Tokens.SEMI(0,0)
+        fun loop lexer =
+            let 
+              val (result,lexer) = invoke lexer
+              val (nextToken,lexer) = CalcParser.Stream.get lexer
+              val _ = case result
+                          of SOME r => TextIO.output(TextIO.stdOut, "resultado = " ^ r ^ " \n")
+                            | NONE   => ()
+            in
+              if CalcParser.sameToken(nextToken,dummyEOF) then () else loop lexer
+            end
+    in 
+      loop lexer
+    end
 
 end (* structure Calc *)

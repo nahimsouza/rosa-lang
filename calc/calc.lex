@@ -5,7 +5,7 @@ type svalue = Tokens.svalue
 type ('a,'b) token = ('a,'b) Tokens.token
 type lexresult= (svalue,pos) token
 
-type value =
+datatype value =
   Integer of int
   | Real of real
 
@@ -24,8 +24,8 @@ ws = [\ \t];
 %%
 \n       => (pos := (!pos) + 1; lex());
 {ws}+    => (lex());
-{optsign}{digit}+ => (Tokens.INT (Integer valOf (Int.fromString yytext), !pos, !pos));
-{optsign}{digit}+\.{digit}+ => (Tokens.REAL (Real valOf (Int.fromString yytext), !pos, !pos));
+{digit}+ => (Tokens.INT ( valOf (Int.fromString yytext), !pos, !pos));
+{digit}+\.{digit}+ => (Tokens.REAL ( valOf (Real.fromString yytext), !pos, !pos));
 
 
 "="      => (Tokens.EQUAL(!pos,!pos));

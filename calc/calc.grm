@@ -1,11 +1,12 @@
 (* Sample interactive calculator for ML-Yacc *)
 
-fun lookup "bogus" = 10000
-  | lookup s = 0
 
-type value =
+datatype value =
   Integer of int
   | Real of real
+
+fun lookup "bogus" = 10000
+  | lookup s = 0
 
 (* val lookupTable : (string, value) HashTable.hash_table =
     HashTable.mkTable (HashString.hashString, op=) (42, Fail "not found")
@@ -13,10 +14,12 @@ type value =
 fun save id exp = HashTable.insert lookupTable (id, exp) *)
 
 fun soma exp1 exp2 =
-  case (exp1, exp2) of (Integer exp1, Integer exp2) => 
-    Integer (exp1 + exp2)
-  | (Real exp1, Real exp2) => Real exp1 + exp2
-  | _ => Fail "Semantic Error"
+  case (exp1, exp2) of (Integer exp1, Integer exp2) => Integer ((Int.toInt exp1) + (Int.toInt exp2))
+                    | (Real exp1, Real exp2) => Real ((Real.toLarge exp1) + (Real.toLarge exp2))
+
+fun valueToString exp =
+  case exp of Integer x => Int.toString x
+            | Real x => Real.toString x
 
 %%
 
@@ -31,9 +34,9 @@ fun soma exp1 exp2 =
 %left TIMES DIV
 %right CARAT
 
-%term ID of string | INT | REAL | PLUS | TIMES | PRINT |
+%term ID of string | INT of int | REAL of real | PLUS | TIMES | PRINT |
       SEMI | EOF | CARAT | DIV | SUB | EQUAL
-%nonterm EXP of int | START of int option
+%nonterm EXP of value | START of string option
 
 %name Calc
 
@@ -48,20 +51,20 @@ fun soma exp1 exp2 =
 
 (* the parser returns the value associated with the expression *)
 
-  START : PRINT EXP (print (Int.toString EXP);
+  START : PRINT EXP (print (valueToString EXP);
                      print "\n";
-                     SOME EXP)
-        | EXP (SOME EXP)
+                     SOME (valueToString EXP))
+        | EXP (SOME (valueToString EXP))
         | (NONE)
-  EXP : INT             (INT)
-      | REAL            (REAL)
-      | ID              (lookup ID)
+  EXP : INT             (Integer INT)
+      | REAL            (Real REAL)
+      | ID              (Integer (lookup ID))
       (* | ID EQUAL EXP    (save ID EXP) *)
       | EXP PLUS EXP    (soma EXP1 EXP2)
-      | EXP TIMES EXP   (EXP1*EXP2)
+      (* | EXP TIMES EXP   (EXP1*EXP2)
       | EXP DIV EXP     (EXP1 div EXP2)
       | EXP SUB EXP     (EXP1-EXP2)
       | EXP CARAT EXP   (let fun e (m,0) = 1
                                 | e (m,l) = m*e(m,l-1)
                          in e (EXP1,EXP2)
-                         end)
+                         end) *)
