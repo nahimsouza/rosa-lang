@@ -4,9 +4,18 @@
 
 
 (* RosaType represent the types used in ROSA lang *)
+type Sequence = char * string (* char represents the Type (d, r or p) *)
+type Quality = string
 datatype RosaType =
   Integer of int
   | Real of real
+  | Boolean of bool
+  | String of string
+  | Sequence of char * string
+  | Quality of string
+  | FASTA of string * Sequence
+  | FASTQ of string * Quality * Sequence
+
 
 (* lookupTable is a HashTable used to store identifiers and their values *)
 val lookupTable : (string, RosaType) HashTable.hash_table =

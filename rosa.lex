@@ -8,9 +8,17 @@ type ('a,'b) token = ('a,'b) Tokens.token
 type lexresult= (svalue,pos) token
 
 (* RosaType represent the types used in ROSA lang *)
+type Sequence = char * string (* char represents the Type (d, r or p) *)
+type Quality = string
 datatype RosaType =
   Integer of int
   | Real of real
+  | Boolean of bool
+  | String of string
+  | Sequence of char * string
+  | Quality of string
+  | FASTA of string * Sequence
+  | FASTQ of string * Quality * Sequence
 
 val pos = ref 0
 fun eof () = Tokens.EOF(!pos,!pos)
