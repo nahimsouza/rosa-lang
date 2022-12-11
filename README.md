@@ -15,3 +15,28 @@ After the building, the interpreter can also be executed in the terminal:
 > `Rosa.parse();`
 
 Have fun!
+
+## To Do
+
+* implement variable declaration
+
+* implement variable assignment for all types
+
+* implement type checking
+
+* implment function declaration
+
+* implement function calling
+
+    * predefined functions
+
+    * user defined functions
+
+* "print" is broken
+
+* implement if expression (val x = if a then b else c)
+
+* implement conditionals
+
+* implement while
+

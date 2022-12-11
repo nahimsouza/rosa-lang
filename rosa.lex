@@ -27,18 +27,44 @@ fun error (e,l : int,_) = TextIO.output (TextIO.stdOut, String.concat[
       ])
 
 %%
+
 %header (functor RosaLexFun(structure Tokens: Rosa_TOKENS));
 alpha=[A-Za-z];
 digit=[0-9];
 optsign=("+"|"-")?;
 ws = [\ \t];
+boolean = "True" | "False";
+
+symbol = ("!" | "\"" | "#" | "$" | "%" | "&" | "'" | "(" | ")" | "*" | "+" | "," |
+         "-" | "." | "/" | ":" | ";" | "<" | "=" | ">" | "?" | "@" | "[" |  "\\" | "|" |
+         "]" | "^" | "_" | "`" | "{" | "}" | "~");
+
+special = ("á" | "â" | "à" | "ã" | "é" | "ê" | "è" | "í" | "î" | "ì" |
+          "ó" | "ô" | "ò" | "õ" | "ú" | "û" | "ù" | "ç" | "ñ" | "ý" | "Á" | "Â" | "À" | "Ã" | "É" | "Ê" |
+          "È" | "Í" | "Î" | "Ì" | "Ó" | "Ô" | "Ò" | "Õ" | "Ú" | "Û" | "Ù" | "Ç" | "Ñ" | "Ý");
+
+char = ({alpha} | {digit} | {symbol} | {special});
+
+string = "\""{char}*"\"";
+
+dna = "A" | "C" | "G" | "T" | "R" | "Y" | "S" | "W" | "K" | "M" | "B" | "D" | "H" | "V" | "N" | "." | "-";
+protein = "A" | "R" | "N" | "D" | "C" | "Q" | "E" | "G" | "H" | "I" | "M" | "L" | "K" | "F" | "P" | "S" | "T" | "W" | "Y" | "v" | "*";
+rna = "A" | "C" | "G" | "U" | "R" | "Y" | "S" | "W" | "K" | "M" | "B" | "D" | "H" | "V" | "N" | "." | "-";
+
+sequence = "d"{dna}* | "p"{protein}* | "r"{rna}*;
+
+quality = {symbol}* | {alpha}*;
+
+fasta = ">"{string}{sequence}
+
+fastq = "@"{string}{sequence}"+"[{sequence}]{quality};
 
 %%
 \n       => (pos := (!pos) + 1; lex());
 {ws}+    => (lex());
-{digit}+ => (Tokens.INT ( valOf (Int.fromString yytext), !pos, !pos));
-{digit}+\.{digit}+ => (Tokens.REAL ( valOf (Real.fromString yytext), !pos, !pos));
-
+{optsign}{digit}+ => (Tokens.INT ( valOf (Int.fromString yytext), !pos, !pos));
+{optsign}{digit}+\.{digit}+ => (Tokens.REAL ( valOf (Real.fromString yytext), !pos, !pos));
+{boolean} => (Tokens.BOOLEAN ( valOf (Bool.fromString (String.map Char.toLower yytext)), !pos, !pos));
 
 "="      => (Tokens.EQUAL(!pos,!pos));
 "+"      => (Tokens.PLUS(!pos,!pos));

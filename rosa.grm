@@ -79,7 +79,7 @@ fun valueToString exp =
 
 (* Symbols definition - terminal and non-terminals *)
 %term ID of string | INT of int | REAL of real | PLUS | TIMES | PRINT |
-      SEMI | EOF | CARAT | DIV | SUB | EQUAL
+      SEMI | EOF | CARAT | DIV | SUB | EQUAL | BOOLEAN of bool
 %nonterm EXP of RosaType | START of string option
 
 (* Language name used by ML-Lex to generate SML code *)
@@ -106,6 +106,7 @@ fun valueToString exp =
         | (NONE)
   EXP : INT             (Integer INT)
       | REAL            (Real REAL)
+      | BOOLEAN         (Boolean BOOLEAN)
       | ID              (lookup ID)
       | ID EQUAL EXP    (save ID EXP)
       | EXP PLUS EXP    (plus EXP1 EXP2)
