@@ -1,13 +1,13 @@
-(* Sample interactive calculator for ML-Yacc *)
+(* Rosa programming language interpreter - Grammar*)
 
-datatype value =
+datatype RosaType =
   Integer of int
   | Real of real
 
-val lookupTable : (string, value) HashTable.hash_table =
+val lookupTable : (string, RosaType) HashTable.hash_table =
     HashTable.mkTable (HashString.hashString, op=) (42, Fail "not found")
 
-fun lookup id : (value) = HashTable.lookup lookupTable id
+fun lookup id : (RosaType) = HashTable.lookup lookupTable id
 
 fun save id exp = 
   let 
@@ -59,9 +59,9 @@ fun valueToString exp =
 
 %term ID of string | INT of int | REAL of real | PLUS | TIMES | PRINT |
       SEMI | EOF | CARAT | DIV | SUB | EQUAL
-%nonterm EXP of value | START of string option
+%nonterm EXP of RosaType | START of string option
 
-%name Calc
+%name Rosa
 
 %subst PRINT for ID
 %prefer PLUS TIMES DIV SUB

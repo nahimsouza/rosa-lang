@@ -9,7 +9,7 @@ Group is
 
   $/smlnj-lib.cm
 
-  calc.grm
-  calc.lex
-  calc.sml
-
+  rosa.grm
+  rosa.lex
+  rosa.sml
+  functions.sml

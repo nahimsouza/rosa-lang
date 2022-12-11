@@ -1,3 +1,5 @@
+(* Rosa programming language interpreter - Lexer*)
+
 structure Tokens = Tokens
 
 type pos = int
@@ -5,7 +7,7 @@ type svalue = Tokens.svalue
 type ('a,'b) token = ('a,'b) Tokens.token
 type lexresult= (svalue,pos) token
 
-datatype value =
+datatype RosaType =
   Integer of int
   | Real of real
 
@@ -16,7 +18,7 @@ fun error (e,l : int,_) = TextIO.output (TextIO.stdOut, String.concat[
       ])
 
 %%
-%header (functor CalcLexFun(structure Tokens: Calc_TOKENS));
+%header (functor RosaLexFun(structure Tokens: Rosa_TOKENS));
 alpha=[A-Za-z];
 digit=[0-9];
 optsign=("+"|"-")?;

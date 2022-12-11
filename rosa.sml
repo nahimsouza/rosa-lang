@@ -1,31 +1,33 @@
-(* calc.sml *)
+(* Rosa programming language interpreter - Main*)
 
-(* This file provides glue code for building the calculator using the
- * parser and lexer specified in calc.lex and calc.grm.
+(* Based on ML-yacc sample calculator - https://www.smlnj.org/doc/ML-Yacc/mlyacc007.html *)
+
+(* This file provides glue code for building the interpreter using the
+ * parser and lexer specified in rosa.lex and rosa.grm.
 *)
 
-structure Calc : sig
+structure Rosa : sig
 	           val parse : unit -> unit
                  end = 
 struct
 
 (* 
- * We apply the functors generated from calc.lex and calc.grm to produce
- * the CalcParser structure.
+ * We apply the functors generated from rosa.lex and rosa.grm to produce
+ * the RosaParser structure.
  *)
 
-  structure CalcLrVals =
-    CalcLrValsFun(structure Token = LrParser.Token)
+  structure RosaLrVals =
+    RosaLrValsFun(structure Token = LrParser.Token)
 
-  structure CalcLex =
-    CalcLexFun(structure Tokens = CalcLrVals.Tokens)
+  structure RosaLex =
+    RosaLexFun(structure Tokens = RosaLrVals.Tokens)
 
-  structure CalcParser =
+  structure RosaParser =
     Join(structure LrParser = LrParser
-	 structure ParserData = CalcLrVals.ParserData
-	 structure Lex = CalcLex)
+	 structure ParserData = RosaLrVals.ParserData
+	 structure Lex = RosaLex)
 
-datatype value =
+datatype RosaType =
   Integer of int
   | Real of real
 
@@ -38,7 +40,7 @@ datatype value =
       let fun print_error (s,i:int,_) =
 	      TextIO.output(TextIO.stdOut,
 			    "Error, line " ^ (Int.toString i) ^ ", " ^ s ^ "\n")
-       in CalcParser.parse(0,lexstream,print_error,())
+       in RosaParser.parse(0,lexstream,print_error,())
       end
 
 (* 
@@ -50,24 +52,24 @@ datatype value =
 
   fun parse () = 
     let 
-        val lexer = CalcParser.makeLexer (fn _ =>
+        val lexer = RosaParser.makeLexer (fn _ =>
                                             (case TextIO.inputLine TextIO.stdIn
                                                of SOME s => s
                                                | _ => ""))
-        val dummyEOF = CalcLrVals.Tokens.EOF(0,0)
-        val dummySEMI = CalcLrVals.Tokens.SEMI(0,0)
+        val dummyEOF = RosaLrVals.Tokens.EOF(0,0)
+        val dummySEMI = RosaLrVals.Tokens.SEMI(0,0)
         fun loop lexer =
             let 
               val (result,lexer) = invoke lexer
-              val (nextToken,lexer) = CalcParser.Stream.get lexer
+              val (nextToken,lexer) = RosaParser.Stream.get lexer
               val _ = case result
-                          of SOME r => TextIO.output(TextIO.stdOut, "resultado = " ^ r ^ " \n")
+                          of SOME r => TextIO.output(TextIO.stdOut, "output = " ^ r ^ " \n")
                             | NONE   => ()
             in
-              if CalcParser.sameToken(nextToken,dummyEOF) then () else loop lexer
+              if RosaParser.sameToken(nextToken,dummyEOF) then () else loop lexer
             end
     in 
       loop lexer
     end
 
-end (* structure Calc *)
+end (* structure Rosa *)
