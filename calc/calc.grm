@@ -9,7 +9,12 @@ val lookupTable : (string, value) HashTable.hash_table =
 
 fun lookup id : (value) = HashTable.lookup lookupTable id
 
-fun save id exp = HashTable.insert lookupTable (id, exp)
+fun save id exp = 
+  let 
+    val _ = HashTable.insert lookupTable (id, exp)
+  in 
+    exp
+  end
 
 fun soma exp1 exp2 =
   case (exp1, exp2) of (Integer exp1, Integer exp2) => Integer ((Int.toInt exp1) + (Int.toInt exp2))
@@ -34,7 +39,7 @@ fun valueToString exp =
 
 %term ID of string | INT of int | REAL of real | PLUS | TIMES | PRINT |
       SEMI | EOF | CARAT | DIV | SUB | EQUAL
-%nonterm EXP of value | ASSIGN of unit | START of string option
+%nonterm EXP of value | START of string option
 
 %name Calc
 
@@ -53,13 +58,11 @@ fun valueToString exp =
                      print "\n";
                      SOME (valueToString EXP))
         | EXP (SOME (valueToString EXP))
-        | ASSIGN (NONE)
         | (NONE)
-  ASSIGN : ID EQUAL EXP (save ID EXP)
   EXP : INT             (Integer INT)
       | REAL            (Real REAL)
       | ID              (lookup ID)
-      (* | ID EQUAL EXP    (save ID EXP) *)
+      | ID EQUAL EXP    (save ID EXP)
       | EXP PLUS EXP    (soma EXP1 EXP2)
       (* | EXP TIMES EXP   (EXP1*EXP2)
       | EXP DIV EXP     (EXP1 div EXP2)
