@@ -8,10 +8,10 @@
 
 structure Rosa : sig
 	           val parse : unit -> unit
-                 end = 
+                 end =
 struct
 
-(* 
+(*
  * We apply the functors generated from rosa.lex and rosa.grm to produce
  * the RosaParser structure.
  *)
@@ -31,7 +31,7 @@ datatype RosaType =
   Integer of int
   | Real of real
 
-(* 
+(*
  * We need a function which given a lexer invokes the parser. The
  * function invoke does this.
  *)
@@ -43,15 +43,15 @@ datatype RosaType =
        in RosaParser.parse(0,lexstream,print_error,())
       end
 
-(* 
+(*
  * Finally, we need a driver function that reads one or more expressions
  * from the standard input. The function parse, shown below, does
  * this. It runs the calculator on the standard input and terminates when
  * an end-of-file is encountered.
  *)
 
-  fun parse () = 
-    let 
+  fun parse () =
+    let
         val lexer = RosaParser.makeLexer (fn _ =>
                                             (case TextIO.inputLine TextIO.stdIn
                                                of SOME s => s
@@ -59,7 +59,7 @@ datatype RosaType =
         val dummyEOF = RosaLrVals.Tokens.EOF(0,0)
         val dummySEMI = RosaLrVals.Tokens.SEMI(0,0)
         fun loop lexer =
-            let 
+            let
               val (result,lexer) = invoke lexer
               val (nextToken,lexer) = RosaParser.Stream.get lexer
               val _ = case result
@@ -68,7 +68,7 @@ datatype RosaType =
             in
               if RosaParser.sameToken(nextToken,dummyEOF) then () else loop lexer
             end
-    in 
+    in
       loop lexer
     end
 

@@ -1,20 +1,29 @@
 (* Rosa programming language interpreter - Grammar*)
 
+(* ============================ User declarations ============================  *)
+
+
+(* RosaType represent the types used in ROSA lang *)
 datatype RosaType =
   Integer of int
   | Real of real
 
+(* lookupTable is a HashTable used to store identifiers and their values *)
 val lookupTable : (string, RosaType) HashTable.hash_table =
     HashTable.mkTable (HashString.hashString, op=) (42, Fail "not found")
 
+(* get the value of the identifier *)
 fun lookup id : (RosaType) = HashTable.lookup lookupTable id
 
-fun save id exp = 
-  let 
+(* save the value of the identifier and returns the value of 'exp' *)
+fun save id exp =
+  let
     val _ = HashTable.insert lookupTable (id, exp)
-  in 
+  in
     exp
   end
+
+(* Basic expession evaluation functions *)
 
 fun plus exp1 exp2 =
   case (exp1, exp2) of (Integer exp1, Integer exp2) => Integer ((Int.toInt exp1) + (Int.toInt exp2))
@@ -46,6 +55,8 @@ fun valueToString exp =
 
 %%
 
+(* ============================ ML-Yacc declarations ============================  *)
+
 %eop EOF SEMI
 
 (* %pos declares the type of positions for terminals.
@@ -57,10 +68,12 @@ fun valueToString exp =
 %left TIMES DIV
 %right CARAT
 
+(* Symbols definition - terminal and non-terminals *)
 %term ID of string | INT of int | REAL of real | PLUS | TIMES | PRINT |
       SEMI | EOF | CARAT | DIV | SUB | EQUAL
 %nonterm EXP of RosaType | START of string option
 
+(* Language name used by ML-Lex to generate SML code *)
 %name Rosa
 
 %subst PRINT for ID
@@ -70,7 +83,10 @@ fun valueToString exp =
 %noshift EOF
 %value ID ("bogus")
 %verbose
+
 %%
+
+(* ============================ ML-Yacc Rules ============================  *)
 
 (* the parser returns the value associated with the expression *)
 

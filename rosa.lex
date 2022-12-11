@@ -1,4 +1,4 @@
-(* Rosa programming language interpreter - Lexer*)
+(* Rosa programming language interpreter - Lexer *)
 
 structure Tokens = Tokens
 
@@ -7,6 +7,7 @@ type svalue = Tokens.svalue
 type ('a,'b) token = ('a,'b) Tokens.token
 type lexresult= (svalue,pos) token
 
+(* RosaType represent the types used in ROSA lang *)
 datatype RosaType =
   Integer of int
   | Real of real
@@ -23,6 +24,7 @@ alpha=[A-Za-z];
 digit=[0-9];
 optsign=("+"|"-")?;
 ws = [\ \t];
+
 %%
 \n       => (pos := (!pos) + 1; lex());
 {ws}+    => (lex());
