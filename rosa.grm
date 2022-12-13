@@ -4,17 +4,17 @@
 
 
 (* RosaType represent the types used in ROSA lang *)
-type Sequence = char * string (* char represents the Type (d, r or p) *)
-type Quality = string
 datatype RosaType =
   Integer of int
   | Real of real
   | Boolean of bool
   | String of string
-  | Sequence of char * string
+  | RSequence of string
+  | DSequence of string
+  | PSequence of string
   | Quality of string
-  | FASTA of string * Sequence
-  | FASTQ of string * Quality * Sequence
+  | FASTA of string * string
+  | FASTQ of string * string * string
 
 
 (* lookupTable is a HashTable used to store identifiers and their values *)
@@ -79,7 +79,13 @@ fun valueToString exp =
 
 (* Symbols definition - terminal and non-terminals *)
 %term ID of string | INT of int | REAL of real | PLUS | TIMES | PRINT |
-      SEMI | EOF | CARAT | DIV | SUB | EQUAL | BOOLEAN of bool
+      SEMI | EOF | CARAT | DIV | SUB | EQUAL | BOOLEAN of bool |
+      INS | DEL | POINT | TRANSCRIBE | TRANSLATE | COMPLEMENT | MOTIF |
+      QCTRL | TRIM | TOFASTA | READ | READFA | READFQ | WRITE |
+      WRITEFA | WRITEFQ | INPUT | TYPE of string | NOT | AND | OR | DOUBLEEQUAL |
+      LPAREN | RPAREN | STRING of string | 
+      RSEQUENCE of string | DSEQUENCE of string | PSEQUENCE of string |
+      QUALITY of string
 %nonterm EXP of RosaType | START of string option
 
 (* Language name used by ML-Lex to generate SML code *)
@@ -107,8 +113,13 @@ fun valueToString exp =
   EXP : INT             (Integer INT)
       | REAL            (Real REAL)
       | BOOLEAN         (Boolean BOOLEAN)
+      | STRING          (String STRING)
+      | RSEQUENCE       (RSequence RSEQUENCE)
+      | DSEQUENCE       (DSequence DSEQUENCE)
+      | PSEQUENCE       (PSequence PSEQUENCE)
+      | QUALITY         (Quality QUALITY)  
       | ID              (lookup ID)
-      | ID EQUAL EXP    (save ID EXP)
+      | TYPE ID EQUAL EXP    (save ID EXP)
       | EXP PLUS EXP    (plus EXP1 EXP2)
       | EXP TIMES EXP   (times EXP1 EXP2)
       | EXP DIV EXP     (divide EXP1 EXP2)

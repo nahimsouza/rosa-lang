@@ -7,19 +7,6 @@ type svalue = Tokens.svalue
 type ('a,'b) token = ('a,'b) Tokens.token
 type lexresult= (svalue,pos) token
 
-(* RosaType represent the types used in ROSA lang *)
-type Sequence = char * string (* char represents the Type (d, r or p) *)
-type Quality = string
-datatype RosaType =
-  Integer of int
-  | Real of real
-  | Boolean of bool
-  | String of string
-  | Sequence of char * string
-  | Quality of string
-  | FASTA of string * Sequence
-  | FASTQ of string * Quality * Sequence
-
 val pos = ref 0
 fun eof () = Tokens.EOF(!pos,!pos)
 fun error (e,l : int,_) = TextIO.output (TextIO.stdOut, String.concat[
@@ -51,13 +38,35 @@ dna = "A" | "C" | "G" | "T" | "R" | "Y" | "S" | "W" | "K" | "M" | "B" | "D" | "H
 protein = "A" | "R" | "N" | "D" | "C" | "Q" | "E" | "G" | "H" | "I" | "M" | "L" | "K" | "F" | "P" | "S" | "T" | "W" | "Y" | "v" | "*";
 rna = "A" | "C" | "G" | "U" | "R" | "Y" | "S" | "W" | "K" | "M" | "B" | "D" | "H" | "V" | "N" | "." | "-";
 
-sequence = "d"{dna}* | "p"{protein}* | "r"{rna}*;
+rsequence = "r"{rna}*;
+dsequence = "d"{dna}*; 
+psequence = "p"{protein}*;
+
+sequence = {rsequence} | {dsequence} | {psequence};
 
 quality = {symbol}* | {alpha}*;
 
-fasta = ">"{string}{sequence}
+fasta = ">"{string}{sequence};
 
 fastq = "@"{string}{sequence}"+"[{sequence}]{quality};
+
+primitive_type = "Integer" | "Real" | "Boolean" | "String" | "Quality" | "Sequence";
+
+composite_type = "FASTA" | "FASTQ";
+
+recursive_type = "List of "({primitive_type} | {composite_type});
+
+type = ({primitive_type} | {composite_type} | {recursive_type});
+
+op_log = "NOT" | "AND" | "OR";
+
+op_arit = "+" | "-" | "*" | "/";
+
+op_rel = ">" | ">=" | "<" | "<=" | "==" | "!=";
+
+op_bool = {op_log} | {op_rel};
+
+
 
 %%
 \n       => (pos := (!pos) + 1; lex());
@@ -66,17 +75,55 @@ fastq = "@"{string}{sequence}"+"[{sequence}]{quality};
 {optsign}{digit}+\.{digit}+ => (Tokens.REAL ( valOf (Real.fromString yytext), !pos, !pos));
 {boolean} => (Tokens.BOOLEAN ( valOf (Bool.fromString (String.map Char.toLower yytext)), !pos, !pos));
 
+{type} => (Tokens.TYPE(yytext, !pos, !pos));
+
+{string} => (Tokens.STRING(yytext, !pos, !pos));
+
+{rsequence} => (Tokens.RSEQUENCE(yytext, !pos, !pos));
+{dsequence} => (Tokens.DSEQUENCE(yytext, !pos, !pos));
+{psequence} => (Tokens.PSEQUENCE(yytext, !pos, !pos));
+
+{quality} => (Tokens.QUALITY(yytext, !pos, !pos));
+
+
+"NOT"    => (Tokens.NOT(!pos,!pos));
+"AND"    => (Tokens.AND(!pos,!pos));
+"OR"    => (Tokens.OR(!pos,!pos));
+
+{alpha}("_" | {alpha} | {digit})* =>
+            (
+              case yytext of
+                  "print" => Tokens.PRINT(!pos,!pos)
+                | "ins" => Tokens.INS(!pos,!pos)
+                | "del" => Tokens.DEL(!pos,!pos)
+                | "point" => Tokens.POINT(!pos,!pos)
+                | "transcribe" => Tokens.TRANSCRIBE(!pos,!pos)
+                | "translate" => Tokens.TRANSLATE(!pos,!pos)
+                | "complement" => Tokens.COMPLEMENT(!pos,!pos)
+                | "motif" => Tokens.MOTIF(!pos,!pos)
+                | "qctrl" => Tokens.QCTRL(!pos,!pos)
+                | "trim" => Tokens.TRIM(!pos,!pos)
+                | "tofasta" => Tokens.TOFASTA(!pos,!pos)
+                | "read" => Tokens.READ(!pos,!pos)
+                | "readfa" => Tokens.READFA(!pos,!pos)
+                | "readfq" => Tokens.READFQ(!pos,!pos)
+                | "write" => Tokens.WRITE(!pos,!pos)
+                | "writefa" => Tokens.WRITEFA(!pos,!pos)
+                | "writefq" => Tokens.WRITEFQ(!pos,!pos)
+                | "input" => Tokens.INPUT(!pos,!pos)
+                | _ => Tokens.ID(yytext,!pos,!pos)
+            );
+
+"=="     => (Tokens.DOUBLEEQUAL(!pos,!pos));
 "="      => (Tokens.EQUAL(!pos,!pos));
 "+"      => (Tokens.PLUS(!pos,!pos));
-"*"      => (Tokens.TIMES(!pos,!pos));
-";"      => (Tokens.SEMI(!pos,!pos));
-{alpha}+ => (if yytext="print"
-                 then Tokens.PRINT(!pos,!pos)
-                 else Tokens.ID(yytext,!pos,!pos)
-            );
 "-"      => (Tokens.SUB(!pos,!pos));
-"^"      => (Tokens.CARAT(!pos,!pos));
+"*"      => (Tokens.TIMES(!pos,!pos));
 "/"      => (Tokens.DIV(!pos,!pos));
+"^"      => (Tokens.CARAT(!pos,!pos));
+";"      => (Tokens.SEMI(!pos,!pos));
+"("      => (Tokens.LPAREN(!pos,!pos));
+")"      => (Tokens.RPAREN(!pos,!pos));
 "."      => (error ("ignoring bad character "^yytext,!pos,!pos);
              lex());
 
