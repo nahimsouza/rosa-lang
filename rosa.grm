@@ -13,8 +13,8 @@ datatype RosaType =
   | DSequence of string
   | PSequence of string
   | Quality of string
-  | FASTA of string * string
-  | FASTQ of string * string * string
+  | Fasta of string * string
+  | Fastq of string * string * string
 
 
 (* lookupTable is a HashTable used to store identifiers and their values *)
@@ -83,9 +83,9 @@ fun valueToString exp =
       INS | DEL | POINT | TRANSCRIBE | TRANSLATE | COMPLEMENT | MOTIF |
       QCTRL | TRIM | TOFASTA | READ | READFA | READFQ | WRITE |
       WRITEFA | WRITEFQ | INPUT | TYPE of string | NOT | AND | OR | DOUBLEEQUAL |
-      LPAREN | RPAREN | STRING of string | 
+      LPAREN | RPAREN | STRING of string |
       RSEQUENCE of string | DSEQUENCE of string | PSEQUENCE of string |
-      QUALITY of string
+      QUALITY of string | FASTA of string * string
 %nonterm EXP of RosaType | START of string option
 
 (* Language name used by ML-Lex to generate SML code *)
@@ -117,7 +117,8 @@ fun valueToString exp =
       | RSEQUENCE       (RSequence RSEQUENCE)
       | DSEQUENCE       (DSequence DSEQUENCE)
       | PSEQUENCE       (PSequence PSEQUENCE)
-      | QUALITY         (Quality QUALITY)  
+      | QUALITY         (Quality QUALITY)
+      | FASTA           (Fasta FASTA)
       | ID              (lookup ID)
       | TYPE ID EQUAL EXP    (save ID EXP)
       | EXP PLUS EXP    (plus EXP1 EXP2)

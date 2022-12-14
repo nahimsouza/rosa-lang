@@ -2,4 +2,4 @@ Integer val = 1;
 val = val + 10;
 print(val);
 
-FASTA d = "">header\nsskdjflsdjçf""
+FASTA d = "\"\"\"meu headerzinho\nsequencezinho\"\"\""

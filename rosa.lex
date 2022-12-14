@@ -13,6 +13,18 @@ fun error (e,l : int,_) = TextIO.output (TextIO.stdOut, String.concat[
 	"line ", (Int.toString l), ": ", e, "\n"
       ])
 
+fun isWordSeparator c = c = #"\n"
+
+fun splitText(text) = String.tokens isWordSeparator text
+
+fun splitFasta fastaString = 
+  let
+    val trimmed = String.substring(fastaString, 3, (String.size fastaString) - 6);
+    val splited = splitText trimmed
+  in
+    (List.nth(splited,0), List.nth(splited,1))
+  end
+
 %%
 
 %header (functor RosaLexFun(structure Tokens: Rosa_TOKENS));
@@ -38,17 +50,31 @@ dna = "A" | "C" | "G" | "T" | "R" | "Y" | "S" | "W" | "K" | "M" | "B" | "D" | "H
 protein = "A" | "R" | "N" | "D" | "C" | "Q" | "E" | "G" | "H" | "I" | "M" | "L" | "K" | "F" | "P" | "S" | "T" | "W" | "Y" | "v" | "*";
 rna = "A" | "C" | "G" | "U" | "R" | "Y" | "S" | "W" | "K" | "M" | "B" | "D" | "H" | "V" | "N" | "." | "-";
 
+triple_quote = "\"\"\"\"";
+
+identifier = {alpha}("_" | {alpha} | {digit})*;
+
 rsequence = "r"{rna}*;
 dsequence = "d"{dna}*; 
 psequence = "p"{protein}*;
 
+rsequence_tok = {triple_quote}{rsequence}{triple_quote};
+dsequence_tok = {triple_quote}{dsequence}{triple_quote}; 
+psequence_tok = {triple_quote}{psequence}{triple_quote};
+
 sequence = {rsequence} | {dsequence} | {psequence};
+sequence_tok = {triple_quote}{sequence}{triple_quote};
 
-quality = {symbol}* | {alpha}*;
+quality = ({symbol}|{alpha})*;
+quality_tok = {triple_quote}{quality}{triple_quote};
 
-fasta = ">"{string}{sequence};
+separator = "\\n";
 
-fastq = "@"{string}{sequence}"+"[{sequence}]{quality};
+fasta = ">"{string}{separator}{sequence};
+fasta_tok = {triple_quote}{fasta}{triple_quote};
+
+fastq = "@"{string}{separator}{sequence}"+"[{sequence}]{separator}{quality};
+fasta_tok = {triple_quote}{fastq}{triple_quote};
 
 primitive_type = "Integer" | "Real" | "Boolean" | "String" | "Quality" | "Sequence";
 
@@ -67,52 +93,52 @@ op_rel = ">" | ">=" | "<" | "<=" | "==" | "!=";
 op_bool = {op_log} | {op_rel};
 
 
-
 %%
 \n       => (pos := (!pos) + 1; lex());
 {ws}+    => (lex());
-{optsign}{digit}+ => (Tokens.INT ( valOf (Int.fromString yytext), !pos, !pos));
-{optsign}{digit}+\.{digit}+ => (Tokens.REAL ( valOf (Real.fromString yytext), !pos, !pos));
+{digit}+ => (Tokens.INT ( valOf (Int.fromString yytext), !pos, !pos));
+{digit}+\.{digit}+ => (Tokens.REAL ( valOf (Real.fromString yytext), !pos, !pos));
 {boolean} => (Tokens.BOOLEAN ( valOf (Bool.fromString (String.map Char.toLower yytext)), !pos, !pos));
 
 {type} => (Tokens.TYPE(yytext, !pos, !pos));
 
 {string} => (Tokens.STRING(yytext, !pos, !pos));
 
-{rsequence} => (Tokens.RSEQUENCE(yytext, !pos, !pos));
-{dsequence} => (Tokens.DSEQUENCE(yytext, !pos, !pos));
-{psequence} => (Tokens.PSEQUENCE(yytext, !pos, !pos));
+{rsequence_tok} => (Tokens.RSEQUENCE(yytext, !pos, !pos));
+{dsequence_tok} => (Tokens.DSEQUENCE(yytext, !pos, !pos));
+{psequence_tok} => (Tokens.PSEQUENCE(yytext, !pos, !pos));
 
-{quality} => (Tokens.QUALITY(yytext, !pos, !pos));
+{quality_tok} => (Tokens.QUALITY(yytext, !pos, !pos));
 
+{fasta_tok} => (Tokens.FASTA(splitFasta(yytext), !pos, !pos));
 
 "NOT"    => (Tokens.NOT(!pos,!pos));
 "AND"    => (Tokens.AND(!pos,!pos));
 "OR"    => (Tokens.OR(!pos,!pos));
 
-{alpha}("_" | {alpha} | {digit})* =>
-            (
-              case yytext of
-                  "print" => Tokens.PRINT(!pos,!pos)
-                | "ins" => Tokens.INS(!pos,!pos)
-                | "del" => Tokens.DEL(!pos,!pos)
-                | "point" => Tokens.POINT(!pos,!pos)
-                | "transcribe" => Tokens.TRANSCRIBE(!pos,!pos)
-                | "translate" => Tokens.TRANSLATE(!pos,!pos)
-                | "complement" => Tokens.COMPLEMENT(!pos,!pos)
-                | "motif" => Tokens.MOTIF(!pos,!pos)
-                | "qctrl" => Tokens.QCTRL(!pos,!pos)
-                | "trim" => Tokens.TRIM(!pos,!pos)
-                | "tofasta" => Tokens.TOFASTA(!pos,!pos)
-                | "read" => Tokens.READ(!pos,!pos)
-                | "readfa" => Tokens.READFA(!pos,!pos)
-                | "readfq" => Tokens.READFQ(!pos,!pos)
-                | "write" => Tokens.WRITE(!pos,!pos)
-                | "writefa" => Tokens.WRITEFA(!pos,!pos)
-                | "writefq" => Tokens.WRITEFQ(!pos,!pos)
-                | "input" => Tokens.INPUT(!pos,!pos)
-                | _ => Tokens.ID(yytext,!pos,!pos)
-            );
+{identifier} => 
+  (
+    case yytext of
+        "print" => Tokens.PRINT(!pos,!pos)
+      | "ins" => Tokens.INS(!pos,!pos)
+      | "del" => Tokens.DEL(!pos,!pos)
+      | "point" => Tokens.POINT(!pos,!pos)
+      | "transcribe" => Tokens.TRANSCRIBE(!pos,!pos)
+      | "translate" => Tokens.TRANSLATE(!pos,!pos)
+      | "complement" => Tokens.COMPLEMENT(!pos,!pos)
+      | "motif" => Tokens.MOTIF(!pos,!pos)
+      | "qctrl" => Tokens.QCTRL(!pos,!pos)
+      | "trim" => Tokens.TRIM(!pos,!pos)
+      | "tofasta" => Tokens.TOFASTA(!pos,!pos)
+      | "read" => Tokens.READ(!pos,!pos)
+      | "readfa" => Tokens.READFA(!pos,!pos)
+      | "readfq" => Tokens.READFQ(!pos,!pos)
+      | "write" => Tokens.WRITE(!pos,!pos)
+      | "writefa" => Tokens.WRITEFA(!pos,!pos)
+      | "writefq" => Tokens.WRITEFQ(!pos,!pos)
+      | "input" => Tokens.INPUT(!pos,!pos)
+      | _ => Tokens.ID(yytext,!pos,!pos)
+  );
 
 "=="     => (Tokens.DOUBLEEQUAL(!pos,!pos));
 "="      => (Tokens.EQUAL(!pos,!pos));
