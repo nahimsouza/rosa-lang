@@ -17,7 +17,7 @@ fun isWordSeparator c = c = #"\n"
 
 fun splitText(text) = String.tokens isWordSeparator text
 
-fun splitFasta fastaString = 
+fun splitFasta fastaString =
   let
     val trimmed = String.substring(fastaString, 3, (String.size fastaString) - 6);
     val splited = splitText trimmed
@@ -55,11 +55,11 @@ triple_quote = "\"\"\"\"";
 identifier = {alpha}("_" | {alpha} | {digit})*;
 
 rsequence = "r"{rna}*;
-dsequence = "d"{dna}*; 
+dsequence = "d"{dna}*;
 psequence = "p"{protein}*;
 
 rsequence_tok = {triple_quote}{rsequence}{triple_quote};
-dsequence_tok = {triple_quote}{dsequence}{triple_quote}; 
+dsequence_tok = {triple_quote}{dsequence}{triple_quote};
 psequence_tok = {triple_quote}{psequence}{triple_quote};
 
 sequence = {rsequence} | {dsequence} | {psequence};
@@ -116,7 +116,7 @@ op_bool = {op_log} | {op_rel};
 "AND"    => (Tokens.AND(!pos,!pos));
 "OR"    => (Tokens.OR(!pos,!pos));
 
-{identifier} => 
+{identifier} =>
   (
     case yytext of
         "print" => Tokens.PRINT(!pos,!pos)
