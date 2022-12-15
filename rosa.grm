@@ -16,7 +16,6 @@ datatype RosaType =
   | Fasta of string * string
   | Fastq of string * string * string
 
-
 (* lookupTable is a HashTable used to store identifiers and their values *)
 val lookupTable : (string, RosaType) HashTable.hash_table =
     HashTable.mkTable (HashString.hashString, op=) (42, Fail "not found")
@@ -24,13 +23,25 @@ val lookupTable : (string, RosaType) HashTable.hash_table =
 (* get the value of the identifier *)
 fun lookup id : (RosaType) = HashTable.lookup lookupTable id
 
+(* checks if the type of exp matches with the given type name *)
+fun typeMatch exp typename =
+  case (exp, typename) of
+    ((Integer _, "Integer") | (Real _, "Real") | (Boolean _, "Boolean") | (String _, "String")
+      | (Quality _, "Quality") | (RSequence _, "Sequence") | (DSequence _, "Sequence")
+      | (PSequence _, "Sequence")) => true
+    | _ => false
+
 (* save the value of the identifier and returns the value of 'exp' *)
-fun save id exp =
-  let
-    val _ = HashTable.insert lookupTable (id, exp)
-  in
-    exp
-  end
+fun save id exp typename =
+  if typeMatch exp typename
+  then
+    let
+      val _ = HashTable.insert lookupTable (id, exp)
+    in
+      exp
+    end
+  else
+    raise Fail "Type Error: Type mismatch in declaration"
 
 (* Basic expession evaluation functions *)
 
@@ -132,7 +143,7 @@ fun valueToString exp =
       | QUALITY         (Quality QUALITY)
       | FASTA           (Fasta FASTA)
       | ID              (lookup ID)
-      | TYPE ID EQUAL EXP    (save ID EXP)
+      | TYPE ID EQUAL EXP    (save ID EXP TYPE)
       | EXP PLUS EXP    (plus EXP1 EXP2)
       | EXP TIMES EXP   (times EXP1 EXP2)
       | EXP DIV EXP     (divide EXP1 EXP2)
