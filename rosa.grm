@@ -88,6 +88,31 @@ fun divide exp1 exp2 =
                     | (Real exp1, Integer exp2) => Real ((Real.toLarge exp1) / (Real.fromInt exp2))
                     | _ => raise Fail "Type Error: Operation not supported"
 
+(* Sequence reversal helper functions *)
+fun reverseStr s =
+  let
+    fun reverseList(cs, acc) =
+      case cs of
+          [] => acc
+        | c :: cs' => reverseList(cs', c :: acc)
+  in
+    String.implode(reverseList(String.explode(s), []))
+  end
+
+fun reverseSequenceContent s =
+  let
+    val prefix = getSequencePrefix s
+    val content = getSequenceContent s
+  in
+    concat [prefix, (reverseStr content)]
+  end
+
+fun reverse exp =
+  case exp of RSequence exp => RSequence (reverseSequenceContent exp)
+            | DSequence exp => DSequence (reverseSequenceContent exp)
+            | PSequence exp => PSequence (reverseSequenceContent exp)
+            | _ => raise Fail "Type Error: Operation not supported"
+
 fun valueToString exp =
   case exp of Integer x => Int.toString x
             | Real x => Real.toString x
@@ -164,7 +189,4 @@ fun valueToString exp =
       | EXP TIMES EXP   (times EXP1 EXP2)
       | EXP DIV EXP     (divide EXP1 EXP2)
       | EXP SUB EXP     (sub EXP1 EXP2)
-      (* | EXP CARAT EXP   (let fun e (m,0) = 1
-                                | e (m,l) = m*e(m,l-1)
-                         in e (EXP1,EXP2)
-                         end) *)
+      | CARAT EXP       (reverse EXP)
