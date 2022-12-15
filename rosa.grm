@@ -45,11 +45,26 @@ fun save id exp typename =
 
 (* Basic expession evaluation functions *)
 
+(* Sequence concat helper functions *)
+fun getSequenceContent s = String.extract(s, 2, NONE)
+
+fun getSequencePrefix s = String.substring(s, 0, 2)
+
+fun concatSequenceContents(s1, s2) =
+  let
+    val prefix = getSequencePrefix s1
+  in
+    concat [prefix, (getSequenceContent s1), (getSequenceContent s2)]
+  end
+
 fun plus exp1 exp2 =
   case (exp1, exp2) of (Integer exp1, Integer exp2) => Integer ((Int.toInt exp1) + (Int.toInt exp2))
                     | (Real exp1, Real exp2) => Real ((Real.toLarge exp1) + (Real.toLarge exp2))
                     | (Integer exp1, Real exp2) => Real ((Real.fromInt exp1) + (Real.toLarge exp2))
                     | (Real exp1, Integer exp2) => Real ((Real.toLarge exp1) + (Real.fromInt exp2))
+                    | (RSequence exp1, RSequence exp2) => RSequence (concatSequenceContents(exp1, exp2))
+                    | (DSequence exp1, DSequence exp2) => DSequence (concatSequenceContents(exp1, exp2))
+                    | (PSequence exp1, PSequence exp2) => PSequence (concatSequenceContents(exp1, exp2))
                     | _ => raise Fail "Type Error: Operation not supported"
 
 fun times exp1 exp2 =
