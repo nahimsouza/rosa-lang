@@ -76,6 +76,7 @@ fun divide exp1 exp2 =
 fun valueToString exp =
   case exp of Integer x => Int.toString x
             | Real x => Real.toString x
+            | Boolean x => Bool.toString x
             | String x => x
             | Quality x => x
             | RSequence x => x
