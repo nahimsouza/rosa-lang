@@ -16,7 +16,6 @@ datatype RosaType =
   | Fasta of string * string
   | Fastq of string * string * string
 
-
 (* lookupTable is a HashTable used to store identifiers and their values *)
 val lookupTable : (string, RosaType) HashTable.hash_table =
     HashTable.mkTable (HashString.hashString, op=) (42, Fail "not found")
@@ -24,21 +23,48 @@ val lookupTable : (string, RosaType) HashTable.hash_table =
 (* get the value of the identifier *)
 fun lookup id : (RosaType) = HashTable.lookup lookupTable id
 
+(* checks if the type of exp matches with the given type name *)
+fun typeMatch exp typename =
+  case (exp, typename) of
+    ((Integer _, "Integer") | (Real _, "Real") | (Boolean _, "Boolean") | (String _, "String")
+      | (Quality _, "Quality") | (RSequence _, "Sequence") | (DSequence _, "Sequence")
+      | (PSequence _, "Sequence")) => true
+    | _ => false
+
 (* save the value of the identifier and returns the value of 'exp' *)
-fun save id exp =
-  let
-    val _ = HashTable.insert lookupTable (id, exp)
-  in
-    exp
-  end
+fun save id exp typename =
+  if typeMatch exp typename
+  then
+    let
+      val _ = HashTable.insert lookupTable (id, exp)
+    in
+      exp
+    end
+  else
+    raise Fail "Type Error: Type mismatch in declaration"
 
 (* Basic expession evaluation functions *)
+
+(* Sequence concat helper functions *)
+fun getSequenceContent s = String.extract(s, 2, NONE)
+
+fun getSequencePrefix s = String.substring(s, 0, 2)
+
+fun concatSequenceContents(s1, s2) =
+  let
+    val prefix = getSequencePrefix s1
+  in
+    concat [prefix, (getSequenceContent s1), (getSequenceContent s2)]
+  end
 
 fun plus exp1 exp2 =
   case (exp1, exp2) of (Integer exp1, Integer exp2) => Integer ((Int.toInt exp1) + (Int.toInt exp2))
                     | (Real exp1, Real exp2) => Real ((Real.toLarge exp1) + (Real.toLarge exp2))
                     | (Integer exp1, Real exp2) => Real ((Real.fromInt exp1) + (Real.toLarge exp2))
                     | (Real exp1, Integer exp2) => Real ((Real.toLarge exp1) + (Real.fromInt exp2))
+                    | (RSequence exp1, RSequence exp2) => RSequence (concatSequenceContents(exp1, exp2))
+                    | (DSequence exp1, DSequence exp2) => DSequence (concatSequenceContents(exp1, exp2))
+                    | (PSequence exp1, PSequence exp2) => PSequence (concatSequenceContents(exp1, exp2))
                     | _ => raise Fail "Type Error: Operation not supported"
 
 fun times exp1 exp2 =
@@ -62,9 +88,35 @@ fun divide exp1 exp2 =
                     | (Real exp1, Integer exp2) => Real ((Real.toLarge exp1) / (Real.fromInt exp2))
                     | _ => raise Fail "Type Error: Operation not supported"
 
+(* Sequence reversal helper functions *)
+fun reverseStr s =
+  let
+    fun reverseList(cs, acc) =
+      case cs of
+          [] => acc
+        | c :: cs' => reverseList(cs', c :: acc)
+  in
+    String.implode(reverseList(String.explode(s), []))
+  end
+
+fun reverseSequenceContent s =
+  let
+    val prefix = getSequencePrefix s
+    val content = getSequenceContent s
+  in
+    concat [prefix, (reverseStr content)]
+  end
+
+fun reverse exp =
+  case exp of RSequence exp => RSequence (reverseSequenceContent exp)
+            | DSequence exp => DSequence (reverseSequenceContent exp)
+            | PSequence exp => PSequence (reverseSequenceContent exp)
+            | _ => raise Fail "Type Error: Operation not supported"
+
 fun valueToString exp =
   case exp of Integer x => Int.toString x
             | Real x => Real.toString x
+            | Boolean x => Bool.toString x
             | String x => x
             | Quality x => x
             | RSequence x => x
@@ -132,12 +184,9 @@ fun valueToString exp =
       | QUALITY         (Quality QUALITY)
       | FASTA           (Fasta FASTA)
       | ID              (lookup ID)
-      | TYPE ID EQUAL EXP    (save ID EXP)
+      | TYPE ID EQUAL EXP    (save ID EXP TYPE)
       | EXP PLUS EXP    (plus EXP1 EXP2)
       | EXP TIMES EXP   (times EXP1 EXP2)
       | EXP DIV EXP     (divide EXP1 EXP2)
       | EXP SUB EXP     (sub EXP1 EXP2)
-      (* | EXP CARAT EXP   (let fun e (m,0) = 1
-                                | e (m,l) = m*e(m,l-1)
-                         in e (EXP1,EXP2)
-                         end) *)
+      | CARAT EXP       (reverse EXP)
