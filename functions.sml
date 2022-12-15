@@ -1,3 +1,7 @@
+structure RosaFunctions =
+
+struct
+
 open String;
 
 fun ins(sequence, fragment, position) = 
@@ -143,6 +147,8 @@ in
   iter(sequence, motif, 0)
 end;
 
+(* 
+
 fun qctrl(fastq, threshol, range) = ;
 
 fun trim(file, adapters, primers) = ;
@@ -157,4 +163,8 @@ fun writefa(file, name, path) = ;
 
 fun writefq(file, name, path) = ;
 
-fun input(prompt) = ;
+fun input(prompt) = ; 
+
+*)
+
+end (* structure RosaFunctions *)
