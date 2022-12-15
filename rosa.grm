@@ -39,24 +39,28 @@ fun plus exp1 exp2 =
                     | (Real exp1, Real exp2) => Real ((Real.toLarge exp1) + (Real.toLarge exp2))
                     | (Integer exp1, Real exp2) => Real ((Real.fromInt exp1) + (Real.toLarge exp2))
                     | (Real exp1, Integer exp2) => Real ((Real.toLarge exp1) + (Real.fromInt exp2))
+                    | _ => raise Fail "Type Error: Operation not supported"
 
 fun times exp1 exp2 =
   case (exp1, exp2) of (Integer exp1, Integer exp2) => Integer ((Int.toInt exp1) * (Int.toInt exp2))
                     | (Real exp1, Real exp2) => Real ((Real.toLarge exp1) * (Real.toLarge exp2))
                     | (Integer exp1, Real exp2) => Real ((Real.fromInt exp1) * (Real.toLarge exp2))
                     | (Real exp1, Integer exp2) => Real ((Real.toLarge exp1) * (Real.fromInt exp2))
+                    | _ => raise Fail "Type Error: Operation not supported"
 
 fun sub exp1 exp2 =
   case (exp1, exp2) of (Integer exp1, Integer exp2) => Integer ((Int.toInt exp1) - (Int.toInt exp2))
                     | (Real exp1, Real exp2) => Real ((Real.toLarge exp1) - (Real.toLarge exp2))
                     | (Integer exp1, Real exp2) => Real ((Real.fromInt exp1) - (Real.toLarge exp2))
                     | (Real exp1, Integer exp2) => Real ((Real.toLarge exp1) - (Real.fromInt exp2))
+                    | _ => raise Fail "Type Error: Operation not supported"
 
 fun divide exp1 exp2 =
   case (exp1, exp2) of (Integer exp1, Integer exp2) => Integer ((Int.toInt exp1) div (Int.toInt exp2))
                     | (Real exp1, Real exp2) => Real ((Real.toLarge exp1) / (Real.toLarge exp2))
                     | (Integer exp1, Real exp2) => Real ((Real.fromInt exp1) / (Real.toLarge exp2))
                     | (Real exp1, Integer exp2) => Real ((Real.toLarge exp1) / (Real.fromInt exp2))
+                    | _ => raise Fail "Type Error: Operation not supported"
 
 fun valueToString exp =
   case exp of Integer x => Int.toString x
@@ -67,6 +71,7 @@ fun valueToString exp =
             | DSequence x => x
             | PSequence x => x
             | Fasta x => #1(x) ^ "\n" ^ #2(x)
+            | _ => raise Fail "Type Error: Operation not supported"
 
 
 %%

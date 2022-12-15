@@ -50,31 +50,24 @@ dna = "A" | "C" | "G" | "T" | "R" | "Y" | "S" | "W" | "K" | "M" | "B" | "D" | "H
 protein = "A" | "R" | "N" | "D" | "C" | "Q" | "E" | "G" | "H" | "I" | "M" | "L" | "K" | "F" | "P" | "S" | "T" | "W" | "Y" | "v" | "*";
 rna = "A" | "C" | "G" | "U" | "R" | "Y" | "S" | "W" | "K" | "M" | "B" | "D" | "H" | "V" | "N" | "." | "-";
 
-triple_quote = "\"\"\"\"";
-
 identifier = {alpha}("_" | {alpha} | {digit})*;
 
-rsequence = "r"{rna}*;
-dsequence = "d"{dna}*;
-psequence = "p"{protein}*;
-
-rsequence_tok = {triple_quote}{rsequence}{triple_quote};
-dsequence_tok = {triple_quote}{dsequence}{triple_quote};
-psequence_tok = {triple_quote}{psequence}{triple_quote};
+rsequence = "@r"{rna}*;
+dsequence = "@d"{dna}*;
+psequence = "@p"{protein}*;
 
 sequence = {rsequence} | {dsequence} | {psequence};
-sequence_tok = {triple_quote}{sequence}{triple_quote};
 
 quality = ({symbol}|{alpha})*;
-quality_tok = {triple_quote}{quality}{triple_quote};
+quality_tok = "@q"{quality}"ç";
 
-separator = "\\n";
+separator = "§";
 
-fasta = ">"{string}{separator}{sequence};
-fasta_tok = {triple_quote}{fasta}{triple_quote};
+header = {char}*;
 
-fastq = "@"{string}{separator}{sequence}"+"[{sequence}]{separator}{quality};
-fasta_tok = {triple_quote}{fastq}{triple_quote};
+fasta = ">"{header}{separator}{sequence}{separator};
+
+fastq = "@"{header}{separator}{sequence}"+"[{sequence}]{separator}{quality}{separator};
 
 primitive_type = "Integer" | "Real" | "Boolean" | "String" | "Quality" | "Sequence";
 
@@ -104,13 +97,13 @@ op_bool = {op_log} | {op_rel};
 
 {string} => (Tokens.STRING(yytext, !pos, !pos));
 
-{rsequence_tok} => (Tokens.RSEQUENCE(yytext, !pos, !pos));
-{dsequence_tok} => (Tokens.DSEQUENCE(yytext, !pos, !pos));
-{psequence_tok} => (Tokens.PSEQUENCE(yytext, !pos, !pos));
+{rsequence} => (Tokens.RSEQUENCE(yytext, !pos, !pos));
+{dsequence} => (Tokens.DSEQUENCE(yytext, !pos, !pos));
+{psequence} => (Tokens.PSEQUENCE(yytext, !pos, !pos));
 
 {quality_tok} => (Tokens.QUALITY(yytext, !pos, !pos));
 
-{fasta_tok} => (Tokens.FASTA(splitFasta(yytext), !pos, !pos));
+{fasta} => (Tokens.FASTA(splitFasta(yytext), !pos, !pos));
 
 "NOT"    => (Tokens.NOT(!pos,!pos));
 "AND"    => (Tokens.AND(!pos,!pos));
