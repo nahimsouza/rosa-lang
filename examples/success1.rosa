@@ -4,6 +4,13 @@ Integer val3 = 10/2;
 Real val4 = 10/2.3;
 val3 = (val1 + 2)*5;
 
+Boolean b1 = True;
+Boolean b2 = val1 == 1;
+Boolean b3 = val2 > 3.14;
+Boolean b4 = NOT b2;
+Boolean b5 = b1 AND b3;
+b4 = b3 OR b5;
+
 Sequence gene = @dATTGCCCC;
 
 Sequence s2 = @rAUGGCCCC;
