@@ -205,6 +205,7 @@ fun valueToString exp =
       | PSEQUENCE       (PSequence PSEQUENCE)
       | QUALITY         (Quality QUALITY)
       | FASTA           (Fasta FASTA)
+      | LPAREN EXP RPAREN (EXP)
       | ID              (lookup ID)
       | ID EQUAL EXP    (assign ID EXP)
       | TYPE ID EQUAL EXP    (save ID EXP TYPE)
