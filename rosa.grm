@@ -12,16 +12,36 @@ val lookupTable : (string, RosaType) HashTable.hash_table =
 fun lookup id : (RosaType) = HashTable.lookup lookupTable id
 
 (* checks if the type of exp matches with the given type name *)
-fun typeMatch exp typename =
+fun typeNameMatch exp typename =
   case (exp, typename) of
     ((Integer _, "Integer") | (Real _, "Real") | (Boolean _, "Boolean") | (String _, "String")
       | (Quality _, "Quality") | (RSequence _, "Sequence") | (DSequence _, "Sequence")
       | (PSequence _, "Sequence")) => true
     | _ => false
 
+(* checks if the type (RosaType) of expressions exp1 and exp2 match *)
+fun typeMatch exp1 exp2 =
+  case (exp1, exp2) of
+    ((Integer _, Integer _) | (Real _, Real _) | (Boolean _, Boolean _) | (String _, String _)
+      | (Quality _, Quality _) | (RSequence _, RSequence _) | (DSequence _, DSequence _)
+      | (PSequence _, PSequence _)) => true
+    | _ => false
+
+(* assigns the value of exp to the identifier, if previously declared, and returns the value of 'exp' *)
+fun assign id exp =
+  let
+    val stored = lookup id (* raises if id is not declared*)
+  in
+    if typeMatch stored exp
+    then
+      (HashTable.insert lookupTable (id, exp); exp)
+    else
+      raise Fail "Type Error: Type mismatch in assignment"
+  end
+
 (* save the value of the identifier and returns the value of 'exp' *)
 fun save id exp typename =
-  if typeMatch exp typename
+  if typeNameMatch exp typename
   then
     let
       val _ = HashTable.insert lookupTable (id, exp)
@@ -173,6 +193,7 @@ fun valueToString exp =
       | QUALITY         (Quality QUALITY)
       | FASTA           (Fasta FASTA)
       | ID              (lookup ID)
+      | ID EQUAL EXP    (assign ID EXP)
       | TYPE ID EQUAL EXP    (save ID EXP TYPE)
       | EXP PLUS EXP    (plus EXP1 EXP2)
       | EXP TIMES EXP   (times EXP1 EXP2)
