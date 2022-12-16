@@ -122,6 +122,18 @@ fun reverse exp =
             | String exp => String (reverseStr exp)
             | _ => raise Fail "Type Error: Operation not supported"
 
+fun logicalNot exp =
+  case exp of Boolean b => Boolean (not b)
+              | _ => raise Fail "Type Error: Operation not supported"
+
+fun logicalAnd exp1 exp2 =
+  case (exp1, exp2) of (Boolean b1, Boolean b2) => Boolean (b1 andalso b2)
+                    | _ => raise Fail "Type Error: Operation not supported"
+
+fun logicalOr exp1 exp2 =
+  case (exp1, exp2) of (Boolean b1, Boolean b2) => Boolean (b1 orelse b2)
+                    | _ => raise Fail "Type Error: Operation not supported"
+
 fun valueToString exp =
   case exp of Integer x => Int.toString x
             | Real x => Real.toString x
@@ -200,6 +212,9 @@ fun valueToString exp =
       | EXP DIV EXP     (divide EXP1 EXP2)
       | EXP SUB EXP     (sub EXP1 EXP2)
       | CARAT EXP       (reverse EXP)
+      | NOT EXP         (logicalNot EXP)
+      | EXP AND EXP     (logicalAnd EXP1 EXP2)
+      | EXP OR EXP      (logicalOr EXP1 EXP2)
       | TRANSCRIBE LPAREN EXP RPAREN (transcribe EXP)
       | TRANSLATE LPAREN EXP RPAREN (translate EXP)
       | COMPLEMENT LPAREN EXP RPAREN (complement EXP)
