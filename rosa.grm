@@ -158,9 +158,9 @@ fun valueToString exp =
 
 (* the parser returns the value associated with the expression *)
 
-  START : PRINT EXP (print (valueToString EXP);
-                     print "\n";
-                     SOME (valueToString EXP))
+  START : PRINT LPAREN EXP RPAREN (print (valueToString EXP);
+                                  print "\n";
+                                  SOME (valueToString EXP))
         | EXP (SOME (valueToString EXP))
         | (NONE)
   EXP : INT             (Integer INT)

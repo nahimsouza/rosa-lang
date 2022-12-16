@@ -1,5 +1,26 @@
-Integer val = 1;
-val = val + 10;
-print(val);
+Integer val1 = 1;
+Real val2 = 1 + 2.1;
+Integer val3 = 10/2;
+Real val4 = 10/2.3;
 
-FASTA d = "\"\"\"meu headerzinho\nsequencezinho\"\"\""
+Sequence gene = @dATTGCCCC;
+
+Sequence s2 = @rAUGGCCCC;
+
+Sequence gene_mutado = point(gene, 3, @dA);
+
+Sequence gene_mutado_2 = ins(gene_mutado, @dGGGAAA, 4);
+
+Sequence mRNA = transcribe(gene_mutado_2);
+
+Sequence rna_complement = complement(mRNA);
+
+Sequence rna_final = @rAUGUACCUCAGCCCCCCGGGAGGUCAC + rna_complement;
+
+Sequence proteina = translate(rna_final);
+
+String pmotif = motif(proteina, @pGG);
+
+
+
+
