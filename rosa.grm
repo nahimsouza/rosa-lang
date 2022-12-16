@@ -2,19 +2,7 @@
 
 (* ============================ User declarations ============================  *)
 
-
-(* RosaType represent the types used in ROSA lang *)
-datatype RosaType =
-  Integer of int
-  | Real of real
-  | Boolean of bool
-  | String of string
-  | RSequence of string
-  | DSequence of string
-  | PSequence of string
-  | Quality of string
-  | Fasta of string * string
-  | Fastq of string * string * string
+open RosaFunctions;
 
 (* lookupTable is a HashTable used to store identifiers and their values *)
 val lookupTable : (string, RosaType) HashTable.hash_table =
@@ -111,6 +99,7 @@ fun reverse exp =
   case exp of RSequence exp => RSequence (reverseSequenceContent exp)
             | DSequence exp => DSequence (reverseSequenceContent exp)
             | PSequence exp => PSequence (reverseSequenceContent exp)
+            | String exp => String (reverseStr exp)
             | _ => raise Fail "Type Error: Operation not supported"
 
 fun valueToString exp =
@@ -143,7 +132,7 @@ fun valueToString exp =
 
 (* Symbols definition - terminal and non-terminals *)
 %term ID of string | INT of int | REAL of real | PLUS | TIMES | PRINT |
-      SEMI | EOF | CARAT | DIV | SUB | EQUAL | BOOLEAN of bool |
+      SEMI | EOF | CARAT | DIV | SUB | EQUAL | BOOLEAN of bool | COMMA |
       INS | DEL | POINT | TRANSCRIBE | TRANSLATE | COMPLEMENT | MOTIF |
       QCTRL | TRIM | TOFASTA | READ | READFA | READFQ | WRITE |
       WRITEFA | WRITEFQ | INPUT | TYPE of string | NOT | AND | OR | DOUBLEEQUAL |
@@ -190,3 +179,10 @@ fun valueToString exp =
       | EXP DIV EXP     (divide EXP1 EXP2)
       | EXP SUB EXP     (sub EXP1 EXP2)
       | CARAT EXP       (reverse EXP)
+      | TRANSCRIBE LPAREN EXP RPAREN (transcribe EXP)
+      | TRANSLATE LPAREN EXP RPAREN (translate EXP)
+      | COMPLEMENT LPAREN EXP RPAREN (complement EXP)
+      | INS LPAREN EXP COMMA EXP COMMA EXP RPAREN (ins(EXP1, EXP2, EXP3))
+      | MOTIF LPAREN EXP COMMA EXP RPAREN (motif(EXP1, EXP2))
+      | DEL LPAREN EXP COMMA EXP COMMA EXP RPAREN (del(EXP1, EXP2, EXP3))
+      | POINT LPAREN EXP COMMA EXP COMMA EXP RPAREN (point(EXP1, EXP2, EXP3))

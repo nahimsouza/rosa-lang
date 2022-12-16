@@ -141,6 +141,7 @@ op_bool = {op_log} | {op_rel};
 "/"      => (Tokens.DIV(!pos,!pos));
 "^"      => (Tokens.CARAT(!pos,!pos));
 ";"      => (Tokens.SEMI(!pos,!pos));
+","      => (Tokens.COMMA(!pos,!pos));
 "("      => (Tokens.LPAREN(!pos,!pos));
 ")"      => (Tokens.RPAREN(!pos,!pos));
 "."      => (error ("ignoring bad character "^yytext,!pos,!pos);

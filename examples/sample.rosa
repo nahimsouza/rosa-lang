@@ -10,7 +10,7 @@ data = qctrl (data);
 data = trim (data, primer, adapter);
 
 FASTA dna = tofasta (data)
-Sequence mRNA = transcribe (data);
+Sequence mRNA = transcribe(data);
 
 FASTA d;
 d.header = "asdasd";
