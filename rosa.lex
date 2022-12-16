@@ -134,6 +134,11 @@ op_bool = {op_log} | {op_rel};
   );
 
 "=="     => (Tokens.DOUBLEEQUAL(!pos,!pos));
+"!="     => (Tokens.NOTEQUAL(!pos,!pos));
+">"      => (Tokens.GT(!pos,!pos));
+">="     => (Tokens.GEQ(!pos,!pos));
+"<"      => (Tokens.LT(!pos,!pos));
+"<="     => (Tokens.LEQ(!pos,!pos));
 "="      => (Tokens.EQUAL(!pos,!pos));
 "+"      => (Tokens.PLUS(!pos,!pos));
 "-"      => (Tokens.SUB(!pos,!pos));

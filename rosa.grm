@@ -134,6 +134,34 @@ fun logicalOr exp1 exp2 =
   case (exp1, exp2) of (Boolean b1, Boolean b2) => Boolean (b1 orelse b2)
                     | _ => raise Fail "Type Error: Operation not supported"
 
+fun equal exp1 exp2 =
+  case (exp1, exp2) of (Integer exp1, Integer exp2) => Boolean (exp1 = exp2)
+                    | (Real exp1, Real exp2) => Boolean (Real.==(exp1, exp2))
+                    | (Boolean exp1, Boolean exp2) => Boolean (exp1 = exp2)
+                    | (String exp1, String exp2) => Boolean (exp1 = exp2)
+                    | (RSequence exp1, RSequence exp2) => Boolean (exp1 = exp2)
+                    | (DSequence exp1, DSequence exp2) => Boolean (exp1 = exp2)
+                    | (PSequence exp1, PSequence exp2) => Boolean (exp1 = exp2)
+                    | _ => raise Fail "Type Error: Operation not supported"
+
+fun notEqual exp1 exp2 = logicalNot (equal exp1 exp2)
+
+fun greaterThan exp1 exp2 =
+  case (exp1, exp2) of (Integer exp1, Integer exp2) => Boolean (Int.>(exp1, exp2))
+                    | (Real exp1, Real exp2) => Boolean (Real.>(exp1, exp2))
+                    | (String exp1, String exp2) => Boolean (exp1 > exp2)
+                    | _ => raise Fail "Type Error: Operation not supported"
+
+fun greaterThanOrEqual exp1 exp2 =
+  case (exp1, exp2) of (Integer exp1, Integer exp2) => Boolean (Int.>=(exp1, exp2))
+                    | (Real exp1, Real exp2) => Boolean (Real.>=(exp1, exp2))
+                    | (String exp1, String exp2) => Boolean (exp1 >= exp2)
+                    | _ => raise Fail "Type Error: Operation not supported"
+
+fun lessThan exp1 exp2 = logicalNot (greaterThanOrEqual exp1 exp2)
+
+fun lessThanOrEqual exp1 exp2 = logicalNot (greaterThan exp1 exp2)
+
 fun valueToString exp =
   case exp of Integer x => Int.toString x
             | Real x => Real.toString x
@@ -169,6 +197,7 @@ fun valueToString exp =
       INS | DEL | POINT | TRANSCRIBE | TRANSLATE | COMPLEMENT | MOTIF |
       QCTRL | TRIM | TOFASTA | READ | READFA | READFQ | WRITE |
       WRITEFA | WRITEFQ | INPUT | TYPE of string | NOT | AND | OR | DOUBLEEQUAL |
+      NOTEQUAL | GT | GEQ | LT | LEQ |
       LPAREN | RPAREN | STRING of string |
       RSEQUENCE of string | DSEQUENCE of string | PSEQUENCE of string |
       QUALITY of string | FASTA of string * string
@@ -217,6 +246,12 @@ fun valueToString exp =
       | NOT EXP         (logicalNot EXP)
       | EXP AND EXP     (logicalAnd EXP1 EXP2)
       | EXP OR EXP      (logicalOr EXP1 EXP2)
+      | EXP DOUBLEEQUAL EXP (equal EXP1 EXP2)
+      | EXP NOTEQUAL EXP (notEqual EXP1 EXP2)
+      | EXP GT EXP (greaterThan EXP1 EXP2)
+      | EXP GEQ EXP (greaterThanOrEqual EXP1 EXP2)
+      | EXP LT EXP (lessThan EXP1 EXP2)
+      | EXP LEQ EXP (lessThanOrEqual EXP1 EXP2)
       | TRANSCRIBE LPAREN EXP RPAREN (transcribe EXP)
       | TRANSLATE LPAREN EXP RPAREN (translate EXP)
       | COMPLEMENT LPAREN EXP RPAREN (complement EXP)
