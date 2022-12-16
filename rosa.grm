@@ -158,6 +158,7 @@ fun valueToString exp =
 
 %pos int
 
+%left AND OR
 %left SUB PLUS
 %left TIMES DIV
 %right CARAT
