@@ -1,5 +1,7 @@
 # Rosa Programming Language Interpreter
 
+Rosa is a programming language for analysis of biological sequences. More details in [rosa-lang.pdf](rosa-lang.pdf). 
+
 This repo contains an interpreter for Rosa programming language, written in SML.
 
 You need to install an SML interpreter, for instance, [SMLNJ](https://www.smlnj.org/).
